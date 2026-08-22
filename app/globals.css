@@ -478,6 +478,51 @@ html:not([data-intro="done"]) .panel-flip {
   background: rgba(255, 255, 255, 0.88);
 }
 
+.curtain-intro[data-period="day"] .curtain-moon,
+.curtain-intro[data-period="day"] .curtain-star {
+  display: none;
+}
+
+.curtain-intro[data-period="night"] .curtain-wipe-light {
+  background:
+    radial-gradient(circle at 80% 14%, rgba(253, 224, 71, 0.12), transparent 22%),
+    linear-gradient(180deg, #1e3a5f 0%, #1e293b 55%, #0f172a 100%);
+}
+
+.curtain-intro[data-period="night"] .curtain-wipe-dark {
+  background:
+    radial-gradient(circle at 82% 10%, rgba(253, 224, 71, 0.2), transparent 22%),
+    radial-gradient(circle at 18% 82%, rgba(30, 64, 175, 0.45), transparent 34%),
+    linear-gradient(180deg, #1d4ed8 0%, #1e3a8a 42%, #0f172a 100%);
+}
+
+.curtain-intro[data-period="night"] .curtain-moon {
+  opacity: 1;
+  box-shadow:
+    0 0 36px rgba(253, 224, 71, 0.55),
+    0 0 80px rgba(253, 224, 71, 0.2);
+}
+
+.curtain-intro[data-period="night"] .curtain-sky-light .curtain-moon {
+  opacity: 0.28;
+}
+
+.curtain-intro[data-period="night"] .curtain-star {
+  opacity: 0.9;
+}
+
+.curtain-intro[data-period="night"] .curtain-sky-light .curtain-star {
+  opacity: 0.45;
+}
+
+.curtain-intro[data-period="night"] .curtain-cloud {
+  background: rgba(148, 163, 184, 0.38);
+}
+
+.curtain-intro[data-period="night"] .curtain-sky-light .curtain-cloud {
+  background: rgba(100, 116, 139, 0.42);
+}
+
 @keyframes curtain-cloud-drift {
   0%,
   100% {

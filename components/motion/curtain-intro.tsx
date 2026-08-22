@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Emblem } from "@/components/layout/emblem";
 import { dispatchIntroDone } from "@/components/motion/scroll-reveal";
 import { SITE } from "@/lib/constants";
+import { dayPeriod, type DayPeriod } from "@/lib/day-period";
 import { cn } from "@/lib/utils";
 
 const OPEN_MS = 2200;
@@ -56,6 +57,11 @@ function CurtainSky({ tone }: { tone: "dark" | "light" }) {
 
 export function CurtainIntro() {
   const [phase, setPhase] = useState<"hold" | "open" | "gone">("hold");
+  const [period, setPeriod] = useState<DayPeriod>("day");
+
+  useEffect(() => {
+    setPeriod(dayPeriod());
+  }, []);
 
   useEffect(() => {
     if (phase === "gone") {
@@ -89,6 +95,8 @@ export function CurtainIntro() {
   return (
     <div
       className={cn("curtain-intro", phase === "open" && "is-opening")}
+      data-period={period}
+      suppressHydrationWarning
       role="presentation"
     >
       <div className="curtain-wipe curtain-wipe-light">
