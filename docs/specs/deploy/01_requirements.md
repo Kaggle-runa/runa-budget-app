@@ -26,6 +26,7 @@ SQLite のままでは本番共有ができない。Supabase は用意済み。�
 
 - [ ] OpenNext で Cloudflare Workers に載せる
 - [ ] GitHub Actions からの自動 migrate
+- [x] Render 無料枠のスリープ防止（UptimeRobot で公開トップを 5 分監視）
 
 ## スコープ外
 

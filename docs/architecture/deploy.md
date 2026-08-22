@@ -65,7 +65,7 @@ npm run dev
 
 `render.yaml` を置いてあるので、Blueprint から作ってもよい。値は Dashboard で入れる。
 
-無料枠は約15分アクセスが無いとスリープする。気になる場合は UptimeRobot で数分おきにトップへ GET する。
+無料枠は約15分アクセスが無いとスリープする。[UptimeRobot](https://uptimerobot.com) で公開トップへ 5 分おきに HTTP GET する。`/admin` は叩かない。スリープ中の最初の1回は数十秒かかることがある。
 
 ## 3. 代替: Cloudflare（OpenNext）
 
