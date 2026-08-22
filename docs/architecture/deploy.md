@@ -31,7 +31,8 @@ Cloudflare Pages は帯域無制限で静的サイトには最適。ここへ載
 2. Spending Limit / 課金上限を確認する
 3. **Connect**（または Project Settings > Database）から接続文字列をコピーする
    - **Transaction pooler**（ポート `6543`）→ `DATABASE_URL`。末尾に `?pgbouncer=true`
-   - **Direct** または **Session**（ポート `5432`）→ `DIRECT_URL`。migrate 用
+   - **Session pooler**（ポート `5432`、ホストは `*.pooler.supabase.com`）→ `DIRECT_URL`。migrate 用
+   - `db.xxxx.supabase.co` の Direct は使わない。IPv6 のみのことが多く、Render から届かない（P1001）
 4. パスワードに `@` `#` `%` などがあるときは URL エンコードする
 5. 本番（Render）の Environment に `DATABASE_URL` / `DIRECT_URL` を入れる
 6. ローカルでダミー画面だけ見たいときは `.env` に `USE_LOCAL_SQLITE="true"` を足して `npm run db:sqlite`。Supabase の URL は消さなくてよい

@@ -67,7 +67,7 @@ npm run typecheck
 |------|------|
 | `USE_LOCAL_SQLITE` | `true` ならローカル SQLite（ダミー）。Supabase の URL はそのままでよい |
 | `DATABASE_URL` | Supabase の Transaction pooler（ポート 6543） |
-| `DIRECT_URL` | Supabase の Direct / Session（ポート 5432、migrate 用） |
+| `DIRECT_URL` | Supabase の Session pooler（ポート 5432）。`db.xxxx.supabase.co` は使わない |
 | `ADMIN_PASSWORD` | 管理ログイン |
 | `ADMIN_SECRET` | セッション署名（8文字以上） |
 | `GOOGLE_FORM_URL` | 問い合わせの Google フォーム（任意） |
