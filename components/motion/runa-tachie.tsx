@@ -11,7 +11,7 @@ export function RunaTachie({ empty = false }: { empty?: boolean }) {
   const [mood, setMood] = useState<TachieMood>(empty ? "troubled" : "normal");
   const [hop, setHop] = useState(0);
   const line =
-    empty && mood === "troubled" ? "帳簿がまだ空っぽだよ" : TACHIE[mood].line;
+    empty && mood === "troubled" ? "帳簿がまた空っぽだよ。。" : TACHIE[mood].line;
 
   return (
     <button

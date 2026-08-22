@@ -19,7 +19,7 @@ const mochiy = Mochiy_Pop_One({
 });
 
 export const metadata: Metadata = {
-  title: `${SITE.name} | ${SITE.nickname}`,
+  title: "ルナの公開家計簿",
   description: SITE.description,
 };
 
