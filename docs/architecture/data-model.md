@@ -49,6 +49,14 @@ erDiagram
     datetime publishedAt
     boolean published
   }
+  ComicStrip {
+    string id PK
+    string title
+    string panel1Url
+    string panel4Url
+    boolean published
+    int sortOrder
+  }
 ```
 
 ## 共通列
@@ -140,6 +148,22 @@ erDiagram
 | published | bool | yes | false なら公開しない |
 
 インデックス: `publishedAt`, `published`
+
+## ComicStrip
+
+紹介ページの4コマ作品。1行が4枚。
+
+| 列 | 型 | 必須 | 値 |
+|----|----|------|-----|
+| title | text | yes | 作品タイトル |
+| panel1Url | text | yes | 1コマ目の公開URLまたは `/brand/...` |
+| panel2Url | text | yes | |
+| panel3Url | text | yes | |
+| panel4Url | text | yes | |
+| published | bool | yes | false なら公開しない |
+| sortOrder | int | yes | 小さいほど上。既定 0 |
+
+インデックス: `published`, `sortOrder`
 
 ## 置かないもの
 

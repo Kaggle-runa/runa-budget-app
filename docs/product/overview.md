@@ -35,7 +35,7 @@
 | 3 | カレンダー | 日次損益 + 予定バッジ。選択日の明細 | docs/specs/calendar/ |
 | 4 | 取引明細 | 公開台帳（一次データ） | docs/specs/ledger/ |
 | 5 | 企画募集 | 視聴者投稿とステータス一覧 | docs/specs/idea-submissions/ |
-| 6 | 管理画面 | ログイン、取引/予定/お知らせ CRUD、企画モデレーション | docs/specs/admin/ |
+| 6 | 管理画面 | ログイン、取引/予定/お知らせ/4コマ CRUD、企画モデレーション | docs/specs/admin/ |
 | 7 | お知らせ | 配信や更新のカード一覧 | docs/specs/announcements/ |
 | 8 | 問い合わせ | Googleフォームへ遷移 | docs/specs/contact/ |
 

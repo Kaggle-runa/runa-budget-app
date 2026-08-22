@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +21,7 @@ function SubmitButton({ editing }: { editing: boolean }) {
 }
 
 export function AnnouncementForm({ initial }: { initial?: AnnouncementDTO }) {
-  const [state, action] = useFormState(upsertAnnouncementAction, {});
+  const [state, action] = useActionState(upsertAnnouncementAction, {});
 
   return (
     <form action={action} className="grid gap-4 md:grid-cols-2">

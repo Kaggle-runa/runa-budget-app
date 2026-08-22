@@ -4,6 +4,7 @@ import { toTransactionDTO } from "@/lib/finance";
 import { ANNOUNCEMENT_CATEGORIES } from "@/lib/categories";
 import type {
   AnnouncementDTO,
+  ComicStripDTO,
   EventDTO,
   IdeaDTO,
   ProjectDTO,
@@ -162,18 +163,52 @@ export async function listProjects(): Promise<ProjectDTO[]> {
   }));
 }
 
+function toComicStripDTO(row: {
+  id: string;
+  title: string;
+  panel1Url: string;
+  panel2Url: string;
+  panel3Url: string;
+  panel4Url: string;
+  published: boolean;
+  sortOrder: number;
+}): ComicStripDTO {
+  return {
+    id: row.id,
+    title: row.title,
+    panel1Url: row.panel1Url,
+    panel2Url: row.panel2Url,
+    panel3Url: row.panel3Url,
+    panel4Url: row.panel4Url,
+    published: row.published,
+    sortOrder: row.sortOrder,
+  };
+}
+
+export async function listComicStrips(options?: {
+  publishedOnly?: boolean;
+}): Promise<ComicStripDTO[]> {
+  const rows = await prisma.comicStrip.findMany({
+    where: options?.publishedOnly ? { published: true } : undefined,
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+  });
+  return rows.map(toComicStripDTO);
+}
+
 export async function getLatestUpdatedAt(): Promise<Date | null> {
-  const [tx, event, idea, announcement] = await Promise.all([
+  const [tx, event, idea, announcement, comic] = await Promise.all([
     prisma.transaction.findFirst({ orderBy: { updatedAt: "desc" } }),
     prisma.event.findFirst({ orderBy: { updatedAt: "desc" } }),
     prisma.idea.findFirst({ orderBy: { updatedAt: "desc" } }),
     prisma.announcement.findFirst({ orderBy: { updatedAt: "desc" } }),
+    prisma.comicStrip.findFirst({ orderBy: { updatedAt: "desc" } }),
   ]);
   const dates = [
     tx?.updatedAt,
     event?.updatedAt,
     idea?.updatedAt,
     announcement?.updatedAt,
+    comic?.updatedAt,
   ].filter(
     (value): value is Date => Boolean(value)
   );

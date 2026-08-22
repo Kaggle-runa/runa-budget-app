@@ -1,37 +1,60 @@
+import Image from "next/image";
 import { GlassCard } from "@/components/layout/glass-card";
+import type { ComicStripDTO } from "@/types/domain";
 
-const PANELS = [
-  { no: "1", title: "ご飯代", body: "残高が減っていくんだぁ…", emoji: "🌙" },
-  { no: "2", title: "お仕事", body: "データで何か作ってみる！", emoji: "✨" },
-  { no: "3", title: "ごはん", body: "ちょっと増えたね", emoji: "🍙" },
-  { no: "4", title: "企画", body: "つぎは君と考えるよ", emoji: "💌" },
-];
+function isRemote(src: string) {
+  return src.startsWith("http://") || src.startsWith("https://");
+}
 
-export function YonKoma() {
+function PanelImage({ src, alt }: { src: string; alt: string }) {
+  const className = "h-full w-full object-cover";
+  if (isRemote(src)) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={src} alt={alt} className={className} />
+    );
+  }
   return (
-    <section className="reveal reveal-5">
-      <div className="mb-3 flex items-end justify-between">
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+      className={className}
+    />
+  );
+}
+
+export function YonKoma({ strips }: { strips: ComicStripDTO[] }) {
+  if (strips.length === 0) return null;
+
+  return (
+    <section className="reveal reveal-5 space-y-10">
+      <div className="flex items-end justify-between gap-3">
         <h2 className="text-lg font-semibold text-secondary">ルナの4コマ</h2>
         <p className="text-xs text-muted-foreground">僕の日常、4コマだよ</p>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {PANELS.map((panel, index) => (
-          <GlassCard
-            key={panel.no}
-            className="panel-flip overflow-hidden p-0"
-            style={{ animationDelay: `${0.15 + index * 0.12}s` }}
-          >
-            <div className="flex items-center justify-between bg-gradient-to-r from-sky-200 to-cyan-100 px-3 py-1 text-[11px] text-sky-800">
-              <span>{panel.no} コマ</span>
-              <span>{panel.title}</span>
-            </div>
-            <div className="flex min-h-32 flex-col items-center justify-center gap-2 p-4">
-              <span className="text-3xl">{panel.emoji}</span>
-              <p className="font-display text-sm text-secondary">{panel.body}</p>
-            </div>
-          </GlassCard>
-        ))}
-      </div>
+      {strips.map((strip) => (
+        <div key={strip.id}>
+          <h3 className="mb-3 text-sm font-medium text-secondary">{strip.title}</h3>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[strip.panel1Url, strip.panel2Url, strip.panel3Url, strip.panel4Url].map(
+              (src, index) => (
+                <GlassCard
+                  key={`${strip.id}-${index}`}
+                  className="panel-flip aspect-[3/4] overflow-hidden p-0"
+                  style={{ animationDelay: `${0.15 + index * 0.12}s` }}
+                >
+                  <PanelImage
+                    src={src}
+                    alt={`${strip.title} ${index + 1}コマ目`}
+                  />
+                </GlassCard>
+              )
+            )}
+          </div>
+        </div>
+      ))}
     </section>
   );
 }

@@ -60,7 +60,7 @@ npm run dev
    - `DATABASE_URL` / `DIRECT_URL`（Supabase）
    - `ADMIN_PASSWORD` / `ADMIN_SECRET`（`openssl rand -hex 32` で秘密鍵を作る）
    - `GOOGLE_FORM_URL`（問い合わせの Google フォーム）
-   - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`（お知らせ画像。Settings > API）
+   - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`（お知らせ・4コマ画像。Settings > API）
 5. デプロイ後、`https://<service>.onrender.com/admin/login` で管理ログイン
 
 `render.yaml` を置いてあるので、Blueprint から作ってもよい。値は Dashboard で入れる。

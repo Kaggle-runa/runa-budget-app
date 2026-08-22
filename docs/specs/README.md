@@ -13,6 +13,7 @@ docs/specs/
 ├── ledger/
 ├── idea-submissions/
 ├── announcements/
+├── yonkoma/
 ├── contact/
 ├── admin/
 ├── motion/

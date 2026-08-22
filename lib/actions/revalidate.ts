@@ -13,4 +13,5 @@ export function revalidatePublic(): void {
   revalidatePath("/admin/events");
   revalidatePath("/admin/ideas");
   revalidatePath("/admin/announcements");
+  revalidatePath("/admin/yonkoma");
 }

@@ -25,6 +25,7 @@
 | `/admin/events` | 予定 CRUD | 必要 |
 | `/admin/ideas` | 企画ステータス更新 | 必要 |
 | `/admin/announcements` | お知らせ CRUD | 必要 |
+| `/admin/yonkoma` | 4コマ CRUD | 必要 |
 
 ## Server Action
 
@@ -39,6 +40,8 @@
 | `submitIdeaAction` | `lib/actions/ideas.ts` | 公開 | 企画投稿（honeypot + IP レート制限） |
 | `upsertAnnouncementAction` | `lib/actions/announcements.ts` | admin | お知らせ作成/更新。画像ファイルは Storage へ |
 | `deleteAnnouncementAction` | `lib/actions/announcements.ts` | admin | お知らせ削除 |
+| `upsertComicStripAction` | `lib/actions/comics.ts` | admin | 4コマ作成/更新。画像ファイルは Storage `yonkoma/` へ |
+| `deleteComicStripAction` | `lib/actions/comics.ts` | admin | 4コマ削除 |
 | `updateIdeaStatusAction` | `lib/actions/ideas.ts` | admin | ステータス更新（FormData） |
 | `deleteIdeaAction` | `lib/actions/ideas.ts` | admin | 企画削除 |
 

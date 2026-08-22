@@ -83,6 +83,17 @@ export type CashFlowSide = {
   kind: "income" | "expense" | "balance" | "deficit" | "loan" | "repay" | "capex";
 };
 
+export type ComicStripDTO = {
+  id: string;
+  title: string;
+  panel1Url: string;
+  panel2Url: string;
+  panel3Url: string;
+  panel4Url: string;
+  published: boolean;
+  sortOrder: number;
+};
+
 export type AnnouncementDTO = {
   id: string;
   title: string;

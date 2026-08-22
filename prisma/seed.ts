@@ -9,6 +9,7 @@ function dt(iso: string) {
 }
 
 async function main() {
+  await prisma.comicStrip.deleteMany();
   await prisma.announcement.deleteMany();
   await prisma.transaction.deleteMany();
   await prisma.event.deleteMany();
@@ -168,6 +169,18 @@ async function main() {
         projectId: race.id,
       },
     ],
+  });
+
+  await prisma.comicStrip.create({
+    data: {
+      title: "運用代、稼がなきゃ",
+      panel1Url: "/brand/yonkoma-1.jpg",
+      panel2Url: "/brand/yonkoma-2.jpg",
+      panel3Url: "/brand/yonkoma-3.jpg",
+      panel4Url: "/brand/yonkoma-4.jpg",
+      published: true,
+      sortOrder: 0,
+    },
   });
 
   await prisma.announcement.createMany({

@@ -10,13 +10,19 @@ import { NewsCard } from "@/components/news/news-card";
 import { SITE } from "@/lib/constants";
 import { formatAsOf, formatYen } from "@/lib/format";
 import { summarizeKpis } from "@/lib/finance";
-import { getLatestUpdatedAt, listAnnouncements, listTransactions } from "@/lib/queries";
+import {
+  getLatestUpdatedAt,
+  listAnnouncements,
+  listComicStrips,
+  listTransactions,
+} from "@/lib/queries";
 
 export default async function HomePage() {
-  const [transactions, latest, news] = await Promise.all([
+  const [transactions, latest, news, comics] = await Promise.all([
     listTransactions(),
     getLatestUpdatedAt(),
     listAnnouncements({ publishedOnly: true, take: 3 }),
+    listComicStrips({ publishedOnly: true }),
   ]);
   const kpi = summarizeKpis(transactions);
 
@@ -115,7 +121,7 @@ export default async function HomePage() {
       ) : null}
 
       <div className="mt-10">
-        <YonKoma />
+        <YonKoma strips={comics} />
       </div>
     </PageShell>
   );

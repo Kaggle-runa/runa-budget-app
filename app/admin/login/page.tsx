@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { GlassCard } from "@/components/layout/glass-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +19,7 @@ function SubmitButton() {
 }
 
 export default function AdminLoginPage() {
-  const [state, action] = useFormState(loginAction, {});
+  const [state, action] = useActionState(loginAction, {});
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center">

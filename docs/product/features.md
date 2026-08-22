@@ -15,12 +15,13 @@
 | 8 | 管理画面 | `/admin/*` | [admin](../specs/admin/) | as-built |
 | 9 | 動き・世界観 | 全体 | [motion](../specs/motion/) | as-built |
 | 10 | デプロイ | Render + Supabase | [deploy](../specs/deploy/) / [architecture/deploy.md](../architecture/deploy.md) | as-built |
+| 11 | 4コマ漫画 | `/`, `/admin/yonkoma` | [yonkoma](../specs/yonkoma/) | as-built |
 
 ## 各機能の要点
 
 ### 1. チャンネルトップ
 
-紹介、口調、文字ロゴ、丸ロゴ、月の窓の立ち絵（普通 / 喜び / 困り）、SNS、現金残高のチラ見せ、最新お知らせ3件。
+紹介、口調、文字ロゴ、丸ロゴ、月の窓の立ち絵（普通 / 喜び / 困り）、4コマ、SNS、現金残高のチラ見せ、最新お知らせ3件。
 
 ### 2. 収支ダッシュボード
 
@@ -51,7 +52,7 @@
 
 ### 8. 管理画面
 
-パスワード + HMAC Cookie。取引・予定・企画・お知らせの CRUD。
+パスワード + HMAC Cookie。取引・予定・企画・お知らせ・4コマの CRUD。
 
 ### 9. 動き・世界観
 
@@ -60,6 +61,10 @@ CSS のみ。開幕カーテン、イージング、`prefers-reduced-motion` を
 ### 10. デプロイ
 
 Next.js 1本を Render に載せる。DB は Supabase Postgres。
+
+### 11. 4コマ漫画
+
+紹介ページに公開中の作品を並べる。管理画面から4枚セットで追加・編集・非公開にできる。
 
 ## 第1版でやらないこと
 

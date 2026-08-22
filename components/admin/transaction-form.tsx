@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState, useMemo, useState } from "react";
+import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +28,7 @@ export function TransactionForm({
 }) {
   const [type, setType] = useState<TxType>(initial?.type ?? "income");
   const categories = useMemo(() => categoriesForType(type), [type]);
-  const [state, action] = useFormState(upsertTransactionAction, {});
+  const [state, action] = useActionState(upsertTransactionAction, {});
 
   return (
     <form action={action} className="grid gap-4 md:grid-cols-2">

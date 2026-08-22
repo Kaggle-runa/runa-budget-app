@@ -10,7 +10,10 @@ const ALLOWED_TYPES: Record<string, string> = {
 
 const MAX_BYTES = 5 * 1024 * 1024;
 
-export async function uploadAnnouncementImage(file: File): Promise<string> {
+export async function uploadPublicImage(
+  file: File,
+  folder = ""
+): Promise<string> {
   const type = file.type;
   const ext = ALLOWED_TYPES[type];
   if (!ext) {
@@ -21,9 +24,13 @@ export async function uploadAnnouncementImage(file: File): Promise<string> {
   }
 
   const env = getEnv();
-  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
+  const missing = [
+    !env.SUPABASE_URL ? "SUPABASE_URL" : null,
+    !env.SUPABASE_SERVICE_ROLE_KEY ? "SUPABASE_SERVICE_ROLE_KEY" : null,
+  ].filter((name): name is string => Boolean(name));
+  if (missing.length > 0) {
     throw new Error(
-      "画像アップロードの設定がありません。SUPABASE_URL と SUPABASE_SERVICE_ROLE_KEY を入れてください"
+      `画像アップロードの設定がありません。${missing.join(" と ")} を .env に入れて、dev サーバーを再起動してください`
     );
   }
 
@@ -31,17 +38,22 @@ export async function uploadAnnouncementImage(file: File): Promise<string> {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  const path = `${crypto.randomUUID()}.${ext}`;
+  const prefix = folder ? `${folder.replace(/\/$/, "")}/` : "";
+  const path = `${prefix}${crypto.randomUUID()}.${ext}`;
   const body = Buffer.from(await file.arrayBuffer());
   const { error } = await supabase.storage.from("announcements").upload(path, body, {
     contentType: type,
     upsert: false,
   });
   if (error) {
-    console.error("uploadAnnouncementImage failed", error);
+    console.error("uploadPublicImage failed", error);
     throw new Error("画像の保存に失敗しました");
   }
 
   const { data } = supabase.storage.from("announcements").getPublicUrl(path);
   return data.publicUrl;
+}
+
+export async function uploadAnnouncementImage(file: File): Promise<string> {
+  return uploadPublicImage(file);
 }

@@ -8,6 +8,7 @@ const ITEMS = [
   { href: "/admin/events", label: "予定" },
   { href: "/admin/ideas", label: "企画" },
   { href: "/admin/announcements", label: "お知らせ" },
+  { href: "/admin/yonkoma", label: "4コマ" },
 ];
 
 export function AdminNav({ currentPath }: { currentPath: string }) {
