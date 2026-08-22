@@ -1,0 +1,21 @@
+---
+description: デプロイと本番環境のルール
+alwaysApply: false
+---
+
+# デプロイ
+
+詳細は `docs/architecture/deploy.md` と `docs/adr/0002-supabase-and-cheap-hosting.md`。
+
+## 第1版の構成
+
+- DB は Supabase Postgres。SQLite に戻さない
+- アプリは Next.js 1本。静的の Cloudflare Pages だけに載せない
+- 無料で出すなら Render Web Service + Supabase
+- Cloudflare に載せるなら OpenNext（Workers）。Pages の静的ホスティングではない
+
+## 実装ルール
+
+- `DATABASE_URL`（pooler）と `DIRECT_URL`（migrate）を分ける
+- 本番秘密鍵をリポジトリに置かない
+- Redis / Cloud Run / TiDB を「記事にあったから」で足さない。必要なら ADR を先に書く

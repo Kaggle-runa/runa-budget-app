@@ -1,0 +1,21 @@
+---
+description: 管理者認証の実装ルール
+globs: lib/auth/**/*.ts,middleware.ts,app/admin/**/*.tsx
+alwaysApply: false
+---
+
+# 認証
+
+管理者のみ。視聴者ログインは無い。
+
+## 構成
+
+- `lib/auth/crypto.ts` — HMAC-SHA256（Edge の middleware からも使う。`next/headers` を import しない）
+- `lib/auth/session.ts` — Cookie の発行・削除、`requireAdmin()`
+- `middleware.ts` — `/admin/*`（`/admin/login` 以外）を保護
+
+## 実装ルール
+
+- middleware は通過チェックのみ。Action / 管理ページ用の更新は必ず `requireAdmin()`
+- パスワードと `ADMIN_SECRET` をログに出さない
+- 新しい権限レベルが必要なら先にユーザーへ提案し、`docs/specs/admin/` を更新する

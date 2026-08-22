@@ -1,0 +1,129 @@
+import { formatYen } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import type { BalanceSheet as BalanceSheetData } from "@/types/domain";
+
+const COLORS = {
+  cash: "#5ec4b6",
+  equipment: "#0f9d8a",
+  loan: "#f08080",
+  equity: "#3b82f6",
+} as const;
+
+type Block = {
+  key: string;
+  label: string;
+  amount: number;
+  color: string;
+};
+
+function SheetColumn({
+  title,
+  total,
+  blocks,
+  scale,
+}: {
+  title: string;
+  total: number;
+  blocks: Block[];
+  scale: number;
+}) {
+  const visible = blocks.filter((block) => block.amount > 0);
+  return (
+    <div className="flex min-h-[220px] flex-col">
+      <p className="mb-2 text-sm font-medium text-zinc-500">{title}</p>
+      <div className="flex min-h-[180px] flex-1 flex-col overflow-hidden rounded-2xl">
+        {visible.length === 0 ? (
+          <div className="flex flex-1 items-center justify-center bg-zinc-50 text-sm text-zinc-400">
+            0円
+          </div>
+        ) : (
+          visible.map((block) => {
+            const share = scale > 0 ? block.amount / scale : 0;
+            const compact = share < 0.12;
+            return (
+              <div
+                key={block.key}
+                className={cn(
+                  "flex px-4 text-white",
+                  compact
+                    ? "min-h-10 items-center justify-between"
+                    : "min-h-24 flex-col items-center justify-center text-center"
+                )}
+                style={{
+                  flexGrow: Math.max(block.amount, 1),
+                  background: block.color,
+                }}
+              >
+                <p className={cn("font-medium", compact ? "text-sm" : "text-base")}>
+                  {block.label}
+                </p>
+                <p
+                  className={cn(
+                    "tabular-nums font-semibold tracking-tight",
+                    compact ? "text-sm" : "mt-1 text-2xl"
+                  )}
+                >
+                  {formatYen(block.amount)}
+                </p>
+              </div>
+            );
+          })
+        )}
+      </div>
+      <p className="mt-2 text-sm tabular-nums text-zinc-500">
+        合計 {formatYen(total)}
+      </p>
+    </div>
+  );
+}
+
+export function BalanceSheetView({ sheet }: { sheet: BalanceSheetData }) {
+  const assetBlocks: Block[] = [
+    { key: "cash", label: "流動資産 現金", amount: sheet.cash, color: COLORS.cash },
+    {
+      key: "equipment",
+      label: "固定資産 機材",
+      amount: sheet.equipment,
+      color: COLORS.equipment,
+    },
+  ];
+  const rightBlocks: Block[] = [
+    {
+      key: "loan",
+      label: "固定負債 マスター借入",
+      amount: sheet.loan,
+      color: COLORS.loan,
+    },
+    {
+      key: "equity",
+      label: "純資産 累計収支",
+      amount: Math.max(sheet.equity, 0),
+      color: COLORS.equity,
+    },
+  ];
+  const scale = Math.max(sheet.assets, sheet.loan + Math.max(sheet.equity, 0), 1);
+
+  return (
+    <div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <SheetColumn
+          title="資産"
+          total={sheet.assets}
+          blocks={assetBlocks}
+          scale={scale}
+        />
+        <SheetColumn
+          title="負債・純資産"
+          total={sheet.loan + sheet.equity}
+          blocks={rightBlocks}
+          scale={scale}
+        />
+      </div>
+      {sheet.equity < 0 ? (
+        <p className="mt-3 text-sm text-rose-600">
+          純資産 {formatYen(sheet.equity)}。累計ではまだ赤字だよ。
+        </p>
+      ) : null}
+    </div>
+  );
+}

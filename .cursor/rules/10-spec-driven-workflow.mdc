@@ -1,0 +1,35 @@
+---
+description: 仕様駆動開発のワークフロー（常時適用）
+alwaysApply: true
+---
+
+# 仕様駆動開発ワークフロー
+
+docs/ が仕様の正本。実装の前に次を読む。
+
+1. `docs/product/features.md`（機能一覧）
+2. `docs/architecture/data-model.md`（テーブル構成）
+3. 該当する `docs/specs/<feature-name>/01_requirements.md`
+
+既存機能は `docs/specs/<feature-name>/01_requirements.md` に as-built がある。
+
+## 新機能の実装を指示されたとき
+
+1. `docs/specs/<feature-name>/` が無いなら、いきなり実装せず
+   `_template/` をコピーして `01_requirements.md` を作り、ユーザーのレビューを求める
+2. 要件承認後に `02_design.md` → `03_tasks.md`
+3. 実装はタスク単位。完了したら `[x]`
+
+小さな修正（バグ、文言、スタイル）は仕様書なしで直接実装してよい。
+
+## 実装完了時
+
+- 更新経路を変えたら `docs/api/README.md` を更新
+- データモデルを変えたら `docs/architecture/data-model.md` を更新
+- 機能の追加・削除・範囲変更なら `docs/product/features.md` を更新
+- 新しい環境変数は `.env.example` と `lib/env.ts` に追記
+- `npm run lint && npm run typecheck` を通す
+
+## 仕様と実装がズレていたら
+
+実装を優先せず、まずユーザーに確認する。確認後に仕様書を最新化してから実装する。

@@ -1,0 +1,29 @@
+---
+description: ディレクトリ構成と配置ルール（常時適用）
+alwaysApply: true
+---
+
+# ディレクトリ構成
+
+```
+app/                 # ルーティングとページ組み立てのみ
+components/          # 機能単位のサブディレクトリ
+components/motion/   # CSSアニメ（マスコット・4コマ・タイトル）
+components/ui/       # shadcn/ui（手書きで大きく書き換えない）
+lib/                 # DB・集計・Server Action・認証
+lib/env.ts           # 環境変数（getEnv()）
+lib/utils.ts         # cn()
+types/               # 共有 DTO
+prisma/              # schema / migrations / seed
+render.yaml          # Render Blueprint
+docs/                # 仕様の正本
+public/              # 静的ファイル
+```
+
+## 配置ルール
+
+- DB 操作は `lib/queries.ts` または `lib/actions/`。ページから Prisma を直接叩かない
+- コンポーネントは機能単位（`components/calendar/` 等）。直下へのフラット追加は避ける
+- 共有ドメイン型は `types/`。カテゴリ定数は `lib/categories.ts`
+- グローバル CSS は `app/globals.css` のみ
+- 新しいトップレベルディレクトリが必要なら先にユーザーへ提案する

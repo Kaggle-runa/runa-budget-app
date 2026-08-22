@@ -1,0 +1,29 @@
+---
+description: コンポーネントとUI実装の規約
+globs: components/**/*.tsx,app/**/*.tsx
+alwaysApply: false
+---
+
+# コンポーネント / UI 規約
+
+## 見た目
+
+- llm-game のトークンを使う（`app/globals.css`）
+- 本文は Zen Maru Gothic（`font-sans`）、見出し・ロゴは Mochiy Pop One（`font-display`）
+- パネルは `GlassCard`（`bg-white/80 backdrop-blur-sm border-primary rounded-2xl`）
+- 背景は `SparkleBg` / `.splash-bg`
+- プラス金額は `text-accent`、マイナスは `text-primary`
+- ダークモードは作らない
+- アイコンは lucide-react。ブランドは Moon、家計簿は BookOpen。Sparkles は使わない（AI感が出る）
+- 動きは CSS（`app/globals.css` と `components/motion/`）。yui540 系のおもちゃ感（bob / wiggle / クリック反応）
+- 新しい JS アニメライブラリは足さない。`prefers-reduced-motion` を切らない
+
+## shadcn/ui
+
+- 基礎 UI は `components/ui/`。大きく書き換えず、必要ならラップする
+- ページは組み立てに徹し、ロジックは components / lib へ
+
+## フォーム
+
+- 第1版は Server Action + `useFormState`。react-hook-form は必須にしない
+- エラーメッセージは日本語でフォーム付近に出す

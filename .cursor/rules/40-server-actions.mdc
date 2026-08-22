@@ -1,0 +1,35 @@
+---
+description: Server Action の実装規約
+globs: lib/actions/**/*.ts
+alwaysApply: false
+---
+
+# Server Action 規約
+
+第1版の更新は Server Action が正。新しい REST Route は必要なときだけ足す。
+
+```typescript
+"use server"
+
+export async function upsertExampleAction(
+  _prev: { error?: string } | null,
+  formData: FormData
+): Promise<{ error?: string }> {
+  await requireAdmin() // 管理系は先頭で認可
+  const parsed = schema.safeParse({ title: formData.get("title") })
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "入力が不正です" }
+  }
+  await prisma.example.create({ data: parsed.data })
+  revalidatePublic()
+  return {}
+}
+```
+
+## ルール
+
+- 入力は zod。ビジネスロジックをページに書かない
+- 管理系は `requireAdmin()`。公開投稿は honeypot / レート制限を検討する
+- 保存後は `revalidatePublic()`
+- 追加・変更したら `docs/api/README.md` を更新する
+- 内部エラー詳細をクライアントに返さない

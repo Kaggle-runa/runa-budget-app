@@ -1,0 +1,30 @@
+---
+description: TypeScript / React コーディング規約
+globs: **/*.ts,**/*.tsx
+alwaysApply: false
+---
+
+# コーディング規約
+
+## TypeScript
+
+- `any` を使わない。不明なら `unknown` + 絞り込み、または zod
+- 外部入力（FormData、環境変数）は zod で検証する
+- 環境変数は `process.env` を直接参照せず `getEnv()` を使う（middleware の秘密鍵参照のみ例外）
+- `strict` を外さない。`// @ts-ignore` は原則禁止
+- エラーは握りつぶさない。catch したらログを出してユーザー向け日本語メッセージを返す
+
+## React
+
+- 関数コンポーネントのみ。デフォルトは Server Component
+- ブラウザ API・イベント・状態が必要なときだけ `"use client"`
+- データ取得はサーバー側を優先
+- クラス名の結合は `cn()`
+
+## 命名
+
+- ファイル名: ケバブケース / コンポーネント: PascalCase / 定数: UPPER_SNAKE_CASE
+
+## コメント
+
+- 「なぜ」だけ書く。UI 文言は日本語

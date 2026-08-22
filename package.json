@@ -1,0 +1,52 @@
+{
+  "name": "runa-budget-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && prisma generate --schema prisma/schema.sqlite.prisma && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "prisma generate --schema prisma/schema.sqlite.prisma && tsc --noEmit",
+    "postinstall": "prisma generate && prisma generate --schema prisma/schema.sqlite.prisma",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:sqlite": "prisma generate --schema prisma/schema.sqlite.prisma && prisma db push --force-reset --schema prisma/schema.sqlite.prisma && USE_LOCAL_SQLITE=true tsx prisma/seed.ts",
+    "db:reset": "npm run db:sqlite"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.13.0",
+    "@radix-ui/react-label": "^2.1.1",
+    "@radix-ui/react-slot": "^1.1.1",
+    "@supabase/supabase-js": "^2.109.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.468.0",
+    "next": "^15.1.2",
+    "react": "^18",
+    "react-dom": "^18",
+    "recharts": "^2.15.1",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8",
+    "eslint-config-next": "15.1.2",
+    "postcss": "^8.4.49",
+    "prisma": "^6.13.0",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
+    "typescript": "^5"
+  }
+}

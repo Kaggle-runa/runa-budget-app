@@ -1,0 +1,32 @@
+---
+description: プロジェクト概要と技術スタック（常時適用）
+alwaysApply: true
+---
+
+# プロジェクト概要
+
+華繰ルナ（かぐるな）公開家計簿。天真爛漫なデータサイエンティストがお仕事でご飯代を集める過程を公開するサイト。
+プロダクト概要と口調は `docs/product/overview.md` を参照。
+公開文面は一人称「僕」、二人称「君」、「だよ / だね」。
+数字・帳簿は会計用語（収入 / 支出 / 収支 / 現金残高 / 取引明細 / 科目 / 摘要）。単位は円。時点は yyyy-MM-dd。
+コンセプト語（ご飯代・公開家計簿・企画募集）は地の文だけ。
+
+## 技術スタック（変更する場合は docs/adr/ に記録して合意を得る）
+
+- Next.js 15 App Router + TypeScript + React
+- Tailwind CSS 3 + shadcn/ui（new-york）
+- Prisma + Supabase Postgres（本番）。ローカルは `USE_LOCAL_SQLITE=true` で SQLite のダミーも可（`docs/architecture/deploy.md`）
+- チャート: Recharts
+- バリデーション: zod
+- パッケージ管理: npm
+
+## アプリの種別
+
+- **公開サイト**: 紹介 / 収支 / カレンダー / 取引明細 / 企画投稿
+- **管理画面**: パスワード + HMAC Cookie（`lib/auth/`）。詳細は 70-auth
+
+## 基本方針
+
+- 回答・ドキュメント・コミットメッセージは日本語
+- 実装前に docs/ の仕様を確認する（10-spec-driven-workflow）
+- 秘密情報はハードコードしない。環境変数は `lib/env.ts` の `getEnv()` 経由

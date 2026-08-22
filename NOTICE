@@ -1,0 +1,29 @@
+runa-budget-app
+Copyright 2026 Kaggle-runa
+
+This product is licensed under the Apache License, Version 2.0.
+See the LICENSE file.
+
+Acknowledgments
+---------------
+
+Dashboard information design (cash-flow Sankey, monthly composed chart,
+proportional balance-sheet blocks) was inspired by Polimoney,
+a project of Digital Democracy 2030.
+
+  https://github.com/digitaldemocracy2030/polimoney
+
+Polimoney is licensed under AGPL-3.0. This repository does not include
+Polimoney source code. The name "Polimoney" and related marks belong
+to their respective owners.
+
+Motion easing (cubic-bezier(0.87, 0.05, 0.02, 0.97)) was informed by
+public CSS animation notes from yui540. The comimi package is not
+bundled.
+
+Web fonts Zen Maru Gothic and Mochiy Pop One are used via next/font
+under the SIL Open Font License.
+
+Third-party npm packages retain their own licenses (MIT, Apache-2.0,
+and optional LGPL-3.0-or-later native binaries via sharp/libvips
+as pulled in by Next.js).

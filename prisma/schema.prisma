@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Project {
+  id           String        @id @default(cuid())
+  title        String
+  status       String        @default("planned")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  transactions Transaction[]
+  events       Event[]
+  ideas        Idea[]
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  date      DateTime
+  type      String
+  amount    Int
+  category  String
+  title     String
+  memo      String?
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([date])
+  @@index([type])
+  @@index([category])
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  title     String
+  startAt   DateTime
+  endAt     DateTime
+  allDay    Boolean  @default(false)
+  kind      String   @default("other")
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([startAt])
+  @@index([endAt])
+}
+
+model Idea {
+  id          String   @id @default(cuid())
+  displayName String
+  title       String
+  body        String
+  status      String   @default("submitted")
+  projectId   String?
+  project     Project? @relation(fields: [projectId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  body        String
+  category    String   @default("news")
+  publishedAt DateTime
+  coverUrl    String?
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([publishedAt])
+  @@index([published])
+}
