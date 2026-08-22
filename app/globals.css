@@ -289,6 +289,26 @@ body {
   animation: reveal-up 0.7s var(--ease-runa) both;
 }
 
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.85s var(--ease-runa),
+    transform 0.85s var(--ease-runa);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+[data-reveal].is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+html:not([data-intro="done"]) .reveal,
+html:not([data-intro="done"]) .panel-flip {
+  animation: none !important;
+  opacity: 0;
+}
+
 .reveal-1 {
   animation-delay: 0.06s;
 }
@@ -366,12 +386,118 @@ body {
 
 .curtain-wipe-light {
   z-index: 1;
-  background: #bae6fd;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(255, 255, 255, 0.55), transparent 26%),
+    linear-gradient(180deg, #e0f2fe 0%, #7dd3fc 55%, #38bdf8 100%);
 }
 
 .curtain-wipe-dark {
   z-index: 2;
-  background: #0284c7;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% 10%, rgba(255, 255, 255, 0.22), transparent 24%),
+    radial-gradient(circle at 12% 88%, rgba(125, 211, 252, 0.35), transparent 32%),
+    linear-gradient(180deg, #38bdf8 0%, #0284c7 48%, #0369a1 100%);
+}
+
+.curtain-sky {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.curtain-moon {
+  position: absolute;
+  right: 9%;
+  top: 11%;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 999px;
+  background: radial-gradient(circle at 32% 30%, #fef9c3, #fde68a 55%, #facc15);
+  box-shadow: 0 0 28px rgba(253, 224, 71, 0.45);
+}
+
+.curtain-sky-light .curtain-moon {
+  opacity: 0.35;
+}
+
+.curtain-star {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 0 8px #fff;
+  animation: curtain-twinkle 2.4s ease-in-out infinite;
+}
+
+.curtain-star:nth-child(odd) {
+  animation-delay: 0.6s;
+  width: 3px;
+  height: 3px;
+}
+
+.curtain-sky-light .curtain-star {
+  opacity: 0.25;
+}
+
+.curtain-cloud {
+  position: absolute;
+  width: 7.5rem;
+  height: 2.4rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  animation: curtain-cloud-drift 20s ease-in-out infinite;
+}
+
+.curtain-cloud::before,
+.curtain-cloud::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  background: inherit;
+}
+
+.curtain-cloud::before {
+  width: 3.4rem;
+  height: 3.4rem;
+  left: 1.1rem;
+  top: -1.7rem;
+}
+
+.curtain-cloud::after {
+  width: 4.4rem;
+  height: 4.4rem;
+  left: 3.1rem;
+  top: -2.2rem;
+}
+
+.curtain-sky-light .curtain-cloud {
+  background: rgba(255, 255, 255, 0.88);
+}
+
+@keyframes curtain-cloud-drift {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 22px -10px;
+  }
+}
+
+@keyframes curtain-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
 }
 
 .curtain-center {
@@ -559,6 +685,8 @@ body {
   .ticker-track,
   .curtain-intro,
   .curtain-center,
+  .curtain-cloud,
+  .curtain-star,
   .dash-shutter-band::before,
   .dash-shutter-band::after {
     animation: none !important;
@@ -571,8 +699,10 @@ body {
 
   .reveal,
   .letter-pop,
-  .panel-flip {
+  .panel-flip,
+  [data-reveal] {
     opacity: 1;
     transform: none;
+    transition: none;
   }
 }

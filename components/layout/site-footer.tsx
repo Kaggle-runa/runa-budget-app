@@ -5,7 +5,10 @@ import { SITE } from "@/lib/constants";
 
 export function SiteFooter({ contactHref }: { contactHref?: string }) {
   return (
-    <footer className="relative z-10 mx-auto w-full max-w-6xl px-4 py-10 text-sm text-muted-foreground">
+    <footer
+      data-reveal
+      className="relative z-10 mx-auto w-full max-w-6xl px-4 py-10 text-sm text-muted-foreground"
+    >
       <DashCard className="mb-8">
         <h2 className="text-xl font-bold tracking-tight text-zinc-900">
           {SITE.name}について

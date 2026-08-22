@@ -29,27 +29,34 @@ export function YonKoma({ strips }: { strips: ComicStripDTO[] }) {
   if (strips.length === 0) return null;
 
   return (
-    <section className="reveal reveal-5 space-y-10">
-      <div className="flex items-end justify-between gap-3">
+    <section className="space-y-10">
+      <div data-reveal className="flex items-end justify-between gap-3">
         <h2 className="text-lg font-semibold text-secondary">ルナの4コマ</h2>
         <p className="text-xs text-muted-foreground">僕の日常、4コマだよ</p>
       </div>
       {strips.map((strip) => (
         <div key={strip.id}>
-          <h3 className="mb-3 text-sm font-medium text-secondary">{strip.title}</h3>
+          <h3
+            data-reveal
+            className="mb-3 text-sm font-medium text-secondary"
+          >
+            {strip.title}
+          </h3>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[strip.panel1Url, strip.panel2Url, strip.panel3Url, strip.panel4Url].map(
               (src, index) => (
-                <GlassCard
+                <div
                   key={`${strip.id}-${index}`}
-                  className="panel-flip aspect-[3/4] overflow-hidden p-0"
-                  style={{ animationDelay: `${0.15 + index * 0.12}s` }}
+                  data-reveal
+                  style={{ ["--reveal-delay" as string]: `${index * 90}ms` }}
                 >
-                  <PanelImage
-                    src={src}
-                    alt={`${strip.title} ${index + 1}コマ目`}
-                  />
-                </GlassCard>
+                  <GlassCard className="aspect-[3/4] overflow-hidden p-0">
+                    <PanelImage
+                      src={src}
+                      alt={`${strip.title} ${index + 1}コマ目`}
+                    />
+                  </GlassCard>
+                </div>
               )
             )}
           </div>

@@ -31,6 +31,9 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={`${zenMaru.variable} ${mochiy.variable} font-sans`}>
+        <noscript>
+          <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
         <CurtainIntro />
         {children}
       </body>

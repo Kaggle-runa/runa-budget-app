@@ -17,6 +17,10 @@ import {
   listTransactions,
 } from "@/lib/queries";
 
+function delay(ms: number) {
+  return { ["--reveal-delay" as string]: `${ms}ms` };
+}
+
 export default async function HomePage() {
   const [transactions, latest, news, comics] = await Promise.all([
     listTransactions(),
@@ -28,27 +32,49 @@ export default async function HomePage() {
 
   return (
     <PageShell currentPath="/">
-      <section className="hero-stage reveal">
+      <section className="hero-stage">
         <div className="relative z-10 grid items-center gap-8 px-6 py-8 sm:px-10 sm:py-10 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-sm text-sky-700 ring-1 ring-sky-200 animate-float-y">
+            <p
+              data-reveal
+              style={delay(40)}
+              className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-sm text-sky-700 ring-1 ring-sky-200 animate-float-y"
+            >
               <Moon className="h-4 w-4" />
               ルナの{SITE.nickname}
               <Star className="h-3.5 w-3.5 fill-amber-200 text-amber-400" />
             </p>
             <h1 className="sr-only">{SITE.name}</h1>
-            <Wordmark size="hero" priority />
-            <p className="mt-1 text-sm text-sky-700/70">{SITE.reading}</p>
-            <p className="reveal reveal-1 mt-4 text-lg text-secondary">
+            <div data-reveal style={delay(120)}>
+              <Wordmark size="hero" priority />
+              <p className="mt-1 text-sm text-sky-700/70">{SITE.reading}</p>
+            </div>
+            <p
+              data-reveal
+              style={delay(220)}
+              className="mt-4 text-lg text-secondary"
+            >
               {SITE.tagline}
             </p>
-            <p className="reveal reveal-2 mt-3 max-w-xl text-zinc-600">
+            <p
+              data-reveal
+              style={delay(300)}
+              className="mt-3 max-w-xl text-zinc-600"
+            >
               {SITE.description}
             </p>
-            <p className="reveal reveal-2 mt-2 font-display text-sm text-sky-700">
+            <p
+              data-reveal
+              style={delay(360)}
+              className="mt-2 font-display text-sm text-sky-700"
+            >
               {SITE.catchphrase}
             </p>
-            <div className="reveal reveal-3 mt-6 flex flex-wrap gap-3">
+            <div
+              data-reveal
+              style={delay(440)}
+              className="mt-6 flex flex-wrap gap-3"
+            >
               <Button asChild size="lg">
                 <Link href="/dashboard">収支を見る</Link>
               </Button>
@@ -57,53 +83,62 @@ export default async function HomePage() {
               </Button>
             </div>
           </div>
-          <div className="reveal reveal-2 flex flex-col items-center">
+          <div data-reveal style={delay(200)} className="flex flex-col items-center">
             <RunaTachie empty={transactions.length === 0} />
           </div>
         </div>
       </section>
 
       <section className="mt-10 grid gap-4 md:grid-cols-3">
-        <GlassCard className="reveal reveal-2 p-5">
-          <p className="text-sm text-sky-700/80">現金残高（円）</p>
-          <p
-            className={`mt-2 text-3xl font-semibold animate-pop-in ${kpi.balance >= 0 ? "text-accent" : "text-rose-600"}`}
-          >
-            {formatYen(kpi.balance)}
-          </p>
-          <p className="mt-2 text-xs text-muted-foreground">
-            {latest ? formatAsOf(latest) : kpi.asOf}
-          </p>
-        </GlassCard>
-        <GlassCard className="reveal reveal-3 p-5">
-          <h2 className="flex items-center gap-2 font-semibold text-secondary">
-            <BookOpen className="h-4 w-4 text-sky-500" />
-            今日の見どころ
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            カレンダーだと、配信の日と収支が同じマスに重なるよ。数字、一緒に見てみない？
-          </p>
-          <Button asChild variant="link" className="px-0">
-            <Link href="/calendar">カレンダーへ</Link>
-          </Button>
-        </GlassCard>
-        <GlassCard className="reveal reveal-4 p-5">
-          <h2 className="flex items-center gap-2 font-semibold text-secondary">
-            <Star className="h-4 w-4 fill-amber-200 text-amber-400" />
-            君の企画
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            つぎのお仕事は君の企画から選ぶよ。採用したら帳簿にも載せるね。
-          </p>
-          <Button asChild variant="link" className="px-0">
-            <Link href="/ideas">企画一覧へ</Link>
-          </Button>
-        </GlassCard>
+        <div data-reveal style={delay(0)}>
+          <GlassCard className="p-5">
+            <p className="text-sm text-sky-700/80">現金残高（円）</p>
+            <p
+              className={`mt-2 text-3xl font-semibold animate-pop-in ${kpi.balance >= 0 ? "text-accent" : "text-rose-600"}`}
+            >
+              {formatYen(kpi.balance)}
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {latest ? formatAsOf(latest) : kpi.asOf}
+            </p>
+          </GlassCard>
+        </div>
+        <div data-reveal style={delay(90)}>
+          <GlassCard className="p-5">
+            <h2 className="flex items-center gap-2 font-semibold text-secondary">
+              <BookOpen className="h-4 w-4 text-sky-500" />
+              今日の見どころ
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              カレンダーだと、配信の日と収支が同じマスに重なるよ。数字、一緒に見てみない？
+            </p>
+            <Button asChild variant="link" className="px-0">
+              <Link href="/calendar">カレンダーへ</Link>
+            </Button>
+          </GlassCard>
+        </div>
+        <div data-reveal style={delay(180)}>
+          <GlassCard className="p-5">
+            <h2 className="flex items-center gap-2 font-semibold text-secondary">
+              <Star className="h-4 w-4 fill-amber-200 text-amber-400" />
+              君の企画
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              つぎのお仕事は君の企画から選ぶよ。採用したら帳簿にも載せるね。
+            </p>
+            <Button asChild variant="link" className="px-0">
+              <Link href="/ideas">企画一覧へ</Link>
+            </Button>
+          </GlassCard>
+        </div>
       </section>
 
       {news.length > 0 ? (
         <section className="mt-10">
-          <div className="mb-4 flex items-end justify-between gap-3">
+          <div
+            data-reveal
+            className="mb-4 flex items-end justify-between gap-3"
+          >
             <h2 className="flex items-center gap-2 text-xl font-bold text-secondary">
               <Moon className="h-5 w-5 text-sky-500" />
               お知らせ
@@ -113,8 +148,10 @@ export default async function HomePage() {
             </Button>
           </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {news.map((item) => (
-              <NewsCard key={item.id} item={item} />
+            {news.map((item, index) => (
+              <div key={item.id} data-reveal style={delay(index * 90)}>
+                <NewsCard item={item} />
+              </div>
             ))}
           </div>
         </section>
