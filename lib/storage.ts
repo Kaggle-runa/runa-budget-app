@@ -23,18 +23,15 @@ export async function uploadPublicImage(
     throw new Error("画像は 5MB までです");
   }
 
-  const env = getEnv();
-  const missing = [
-    !env.SUPABASE_URL ? "SUPABASE_URL" : null,
-    !env.SUPABASE_SERVICE_ROLE_KEY ? "SUPABASE_SERVICE_ROLE_KEY" : null,
-  ].filter((name): name is string => Boolean(name));
-  if (missing.length > 0) {
+  const { SUPABASE_URL: supabaseUrl, SUPABASE_SERVICE_ROLE_KEY: serviceRoleKey } =
+    getEnv();
+  if (!supabaseUrl || !serviceRoleKey) {
     throw new Error(
-      `画像アップロードの設定がありません。${missing.join(" と ")} を .env に入れて、dev サーバーを再起動してください`
+      "画像アップロードの設定がありません。SUPABASE_URL と SUPABASE_SERVICE_ROLE_KEY を入れてください"
     );
   }
 
-  const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
