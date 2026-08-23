@@ -716,6 +716,28 @@ html:not([data-intro="done"]) .panel-flip {
   animation-delay: calc(var(--d) + 0.14s);
 }
 
+.mobile-nav-overlay {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(125, 211, 252, 0.45), transparent 28%),
+    radial-gradient(circle at 88% 12%, rgba(251, 207, 232, 0.35), transparent 24%),
+    linear-gradient(180deg, #e0f2fe 0%, #f0f9ff 55%, #dbeafe 100%);
+}
+
+.mobile-nav-orbs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 70%, rgba(186, 230, 253, 0.7) 0 4.5rem, transparent 4.6rem),
+    radial-gradient(circle at 82% 38%, rgba(253, 224, 71, 0.28) 0 3.2rem, transparent 3.3rem),
+    radial-gradient(circle at 70% 80%, rgba(244, 114, 182, 0.18) 0 5rem, transparent 5.1rem);
+}
+
+.mobile-nav-item {
+  animation: reveal-up 0.55s var(--ease-runa) both;
+  animation-delay: var(--nav-delay, 0ms);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .splash-glow,
   .star,
@@ -745,7 +767,8 @@ html:not([data-intro="done"]) .panel-flip {
   .reveal,
   .letter-pop,
   .panel-flip,
-  [data-reveal] {
+  [data-reveal],
+  .mobile-nav-item {
     opacity: 1;
     transform: none;
     transition: none;
