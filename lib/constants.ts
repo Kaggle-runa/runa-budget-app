@@ -48,7 +48,7 @@ export const SOCIAL_LINKS = [
   {
     id: "youtube",
     label: "YouTube",
-    href: "https://www.youtube.com/@hanakuri-runa",
+    href: "https://www.youtube.com/@kaguruna",
     group: "sns",
   },
   {
