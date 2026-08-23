@@ -5,10 +5,11 @@ import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { EVENT_KINDS } from "@/lib/categories";
 import { toDateTimeLocalValue } from "@/lib/format";
 import { upsertEventAction } from "@/lib/actions/events";
-import type { EventDTO, ProjectDTO } from "@/types/domain";
+import type { AnnouncementDTO, EventDTO, ProjectDTO } from "@/types/domain";
 
 function SubmitButton({ editing }: { editing: boolean }) {
   const { pending } = useFormStatus();
@@ -21,9 +22,11 @@ function SubmitButton({ editing }: { editing: boolean }) {
 
 export function EventForm({
   projects,
+  announcements,
   initial,
 }: {
   projects: ProjectDTO[];
+  announcements: AnnouncementDTO[];
   initial?: EventDTO;
 }) {
   const [state, action] = useActionState(upsertEventAction, {});
@@ -89,6 +92,42 @@ export function EventForm({
             </option>
           ))}
         </select>
+      </div>
+      <div className="space-y-1.5 md:col-span-2">
+        <Label htmlFor="announcementId">お知らせリンク（任意）</Label>
+        <select
+          id="announcementId"
+          name="announcementId"
+          defaultValue={initial?.announcementId ?? ""}
+          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+        >
+          <option value="">なし</option>
+          {announcements.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.published ? item.title : `（下書き）${item.title}`}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="space-y-1.5 md:col-span-2">
+        <Label htmlFor="linkUrl">外部リンク（任意）</Label>
+        <Input
+          id="linkUrl"
+          name="linkUrl"
+          type="url"
+          placeholder="https://"
+          defaultValue={initial?.linkUrl ?? ""}
+        />
+      </div>
+      <div className="space-y-1.5 md:col-span-2">
+        <Label htmlFor="body">詳細</Label>
+        <Textarea
+          id="body"
+          name="body"
+          rows={5}
+          placeholder="クリックしたときに見える説明"
+          defaultValue={initial?.body ?? ""}
+        />
       </div>
       <label className="flex items-center gap-2 text-sm md:col-span-2">
         <input

@@ -6,7 +6,7 @@ import { GlassCard } from "@/components/layout/glass-card";
 import { eventKindLabel } from "@/lib/categories";
 import { formatDateDot } from "@/lib/format";
 import { deleteEventAction } from "@/lib/actions/events";
-import { listEvents, listProjects } from "@/lib/queries";
+import { listAnnouncements, listEvents, listProjects } from "@/lib/queries";
 
 export default async function AdminEventsPage({
   searchParams,
@@ -14,7 +14,11 @@ export default async function AdminEventsPage({
   searchParams: Promise<{ id?: string }>;
 }) {
   const { id } = await searchParams;
-  const [events, projects] = await Promise.all([listEvents(), listProjects()]);
+  const [events, projects, announcements] = await Promise.all([
+    listEvents(),
+    listProjects(),
+    listAnnouncements(),
+  ]);
   const editing = events.find((event) => event.id === id);
 
   return (
@@ -30,7 +34,11 @@ export default async function AdminEventsPage({
             </Link>
           </p>
         ) : null}
-        <EventForm projects={projects} initial={editing} />
+        <EventForm
+          projects={projects}
+          announcements={announcements}
+          initial={editing}
+        />
       </GlassCard>
       <GlassCard className="overflow-x-auto">
         <table className="w-full min-w-[720px] text-sm">

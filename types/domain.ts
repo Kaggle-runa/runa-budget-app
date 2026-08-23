@@ -21,8 +21,13 @@ export type EventDTO = {
   endAt: string;
   allDay: boolean;
   kind: EventKind | string;
+  body: string | null;
+  linkUrl: string | null;
   projectId: string | null;
   projectTitle: string | null;
+  announcementId: string | null;
+  announcementTitle: string | null;
+  announcementPublished: boolean;
 };
 
 export type IdeaDTO = {

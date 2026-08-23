@@ -38,16 +38,20 @@ model Transaction {
 }
 
 model Event {
-  id        String   @id @default(cuid())
-  title     String
-  startAt   DateTime
-  endAt     DateTime
-  allDay    Boolean  @default(false)
-  kind      String   @default("other")
-  projectId String?
-  project   Project? @relation(fields: [projectId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String        @id @default(cuid())
+  title          String
+  startAt        DateTime
+  endAt          DateTime
+  allDay         Boolean       @default(false)
+  kind           String        @default("other")
+  body           String?
+  linkUrl        String?
+  projectId      String?
+  project        Project?      @relation(fields: [projectId], references: [id])
+  announcementId String?
+  announcement   Announcement? @relation(fields: [announcementId], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   @@index([startAt])
   @@index([endAt])
@@ -78,6 +82,7 @@ model Announcement {
   published   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  events      Event[]
 
   @@index([publishedAt])
   @@index([published])

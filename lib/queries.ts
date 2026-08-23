@@ -18,9 +18,14 @@ function toEventDTO(row: {
   endAt: Date;
   allDay: boolean;
   kind: string;
+  body: string | null;
+  linkUrl: string | null;
   projectId: string | null;
   project: { title: string } | null;
+  announcementId: string | null;
+  announcement: { title: string; published: boolean } | null;
 }): EventDTO {
+  const announcementPublished = row.announcement?.published === true;
   return {
     id: row.id,
     title: row.title,
@@ -28,8 +33,13 @@ function toEventDTO(row: {
     endAt: row.endAt.toISOString(),
     allDay: row.allDay,
     kind: row.kind,
+    body: row.body,
+    linkUrl: row.linkUrl,
     projectId: row.projectId,
     projectTitle: row.project?.title ?? null,
+    announcementId: row.announcementId,
+    announcementTitle: row.announcement?.title ?? null,
+    announcementPublished,
   };
 }
 
@@ -55,7 +65,7 @@ export async function listTransactionsInRange(
 
 export async function listEvents(): Promise<EventDTO[]> {
   const rows = await prisma.event.findMany({
-    include: { project: true },
+    include: { project: true, announcement: true },
     orderBy: { startAt: "desc" },
   });
   return rows.map(toEventDTO);
@@ -70,7 +80,7 @@ export async function listEventsOverlapping(
       startAt: { lte: end },
       endAt: { gte: start },
     },
-    include: { project: true },
+    include: { project: true, announcement: true },
     orderBy: { startAt: "asc" },
   });
   return rows.map(toEventDTO);

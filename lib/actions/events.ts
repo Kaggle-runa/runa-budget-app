@@ -14,6 +14,11 @@ const eventSchema = z.object({
   allDay: z.enum(["true", "false"]).optional(),
   kind: z.enum(["stream", "release", "project", "other"]),
   projectId: z.string().optional().or(z.literal("")),
+  body: z.string().max(4000).optional().or(z.literal("")),
+  linkUrl: z
+    .union([z.literal(""), z.string().url("リンクの形が不正です")])
+    .optional(),
+  announcementId: z.string().optional().or(z.literal("")),
 });
 
 export async function upsertEventAction(
@@ -29,6 +34,9 @@ export async function upsertEventAction(
     allDay: formData.get("allDay") ? "true" : "false",
     kind: formData.get("kind"),
     projectId: formData.get("projectId") ?? "",
+    body: formData.get("body") ?? "",
+    linkUrl: formData.get("linkUrl") ?? "",
+    announcementId: formData.get("announcementId") ?? "",
   });
 
   if (!parsed.success) {
@@ -57,6 +65,9 @@ export async function upsertEventAction(
       allDay,
       kind: parsed.data.kind,
       projectId: parsed.data.projectId || null,
+      body: parsed.data.body?.trim() || null,
+      linkUrl: parsed.data.linkUrl || null,
+      announcementId: parsed.data.announcementId || null,
     };
     if (parsed.data.id) {
       await prisma.event.update({ where: { id: parsed.data.id }, data });

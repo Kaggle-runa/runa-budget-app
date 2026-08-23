@@ -13,11 +13,13 @@ import {
   startOfWeek,
 } from "date-fns";
 import { ja } from "date-fns/locale";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { DashSectionHeader } from "@/components/dashboard/section-header";
 import { KpiStrip } from "@/components/dashboard/kpi-strip";
 import { DashCard } from "@/components/layout/dash-card";
 import { EmptyState } from "@/components/layout/empty-state";
+import { AnnouncementBody } from "@/components/news/announcement-body";
 import { eventKindLabel } from "@/lib/categories";
 import { dateKey, dayNet, signedLedgerAmount, summarizeMonth } from "@/lib/finance";
 import {
@@ -275,28 +277,7 @@ export function CalendarView({
             {selectedEvents.length === 0 ? (
               <EmptyState title="この日の予定はないよ" />
             ) : (
-              <ul className="space-y-2">
-                {selectedEvents.map((event) => (
-                  <li
-                    key={event.id}
-                    className="flex gap-3 border-l-4 border-zinc-900 pl-3"
-                  >
-                    <div>
-                      <p className="text-xs text-zinc-500">
-                        {event.allDay
-                          ? "終日"
-                          : formatTimeRange(
-                              new Date(event.startAt),
-                              new Date(event.endAt)
-                            )}
-                      </p>
-                      <p className="font-medium text-zinc-900">
-                        {eventKindLabel(event.kind)} / {event.title}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <DayEventList events={selectedEvents} />
             )}
           </div>
           <div>
@@ -327,6 +308,91 @@ export function CalendarView({
         </div>
       </DashCard>
     </div>
+  );
+}
+
+function DayEventList({ events }: { events: EventDTO[] }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  return (
+    <ul className="space-y-2">
+      {events.map((event) => {
+        const newsHref =
+          event.announcementId && event.announcementPublished
+            ? `/news/${event.announcementId}`
+            : null;
+        const hasDetails = Boolean(event.body || newsHref || event.linkUrl);
+        const open = openId === event.id;
+
+        return (
+          <li key={event.id} className="border-l-4 border-zinc-900 pl-3">
+            {hasDetails ? (
+              <button
+                type="button"
+                onClick={() => setOpenId(open ? null : event.id)}
+                className="w-full text-left"
+              >
+                <p className="text-xs text-zinc-500">
+                  {event.allDay
+                    ? "終日"
+                    : formatTimeRange(
+                        new Date(event.startAt),
+                        new Date(event.endAt)
+                      )}
+                </p>
+                <p className="font-medium text-zinc-900">
+                  {eventKindLabel(event.kind)} / {event.title}
+                </p>
+                <p className="mt-0.5 text-xs text-zinc-400">
+                  {open ? "とじる" : "詳細を見る"}
+                </p>
+              </button>
+            ) : (
+              <div>
+                <p className="text-xs text-zinc-500">
+                  {event.allDay
+                    ? "終日"
+                    : formatTimeRange(
+                        new Date(event.startAt),
+                        new Date(event.endAt)
+                      )}
+                </p>
+                <p className="font-medium text-zinc-900">
+                  {eventKindLabel(event.kind)} / {event.title}
+                </p>
+              </div>
+            )}
+            {open && hasDetails ? (
+              <div className="mt-2 space-y-3 rounded-2xl bg-zinc-50 px-3 py-3 text-sm">
+                {event.body ? <AnnouncementBody text={event.body} /> : null}
+                <div className="flex flex-col gap-1">
+                  {newsHref ? (
+                    <Link
+                      href={newsHref}
+                      className="inline-flex items-center gap-1 font-medium text-secondary underline underline-offset-2"
+                    >
+                      {event.announcementTitle || "お知らせを見る"}
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </Link>
+                  ) : null}
+                  {event.linkUrl ? (
+                    <a
+                      href={event.linkUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 font-medium text-secondary underline underline-offset-2"
+                    >
+                      リンクを開く
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
