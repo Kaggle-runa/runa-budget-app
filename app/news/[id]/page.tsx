@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { PageShell } from "@/components/layout/page-shell";
 import { announcementCategoryLabel } from "@/lib/categories";
 import { formatDateDot } from "@/lib/format";
+import { AnnouncementBody } from "@/components/news/announcement-body";
 import { getAnnouncement } from "@/lib/queries";
 
 export default async function NewsDetailPage({
@@ -39,9 +40,9 @@ export default async function NewsDetailPage({
           <h1 className="mt-2 text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl">
             {item.title}
           </h1>
-          <p className="mt-6 whitespace-pre-wrap leading-relaxed text-zinc-700">
-            {item.body}
-          </p>
+          <div className="mt-6">
+            <AnnouncementBody text={item.body} />
+          </div>
         </div>
       </article>
     </PageShell>

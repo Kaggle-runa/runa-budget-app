@@ -100,6 +100,9 @@ export function AnnouncementForm({ initial }: { initial?: AnnouncementDTO }) {
           defaultValue={initial?.body}
           className="min-h-32"
         />
+        <p className="text-xs text-muted-foreground">
+          太字は **こう**。リンクは [表示する文字](https://example.com)。
+        </p>
       </div>
       <label className="flex items-center gap-2 text-sm md:col-span-2">
         <input
