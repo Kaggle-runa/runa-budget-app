@@ -53,19 +53,12 @@ export default async function AdminYonkomaPage({
               <tr key={item.id} className="border-t border-pink-100">
                 <td className="px-4 py-3">{item.sortOrder}</td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-1">
-                    {[item.panel1Url, item.panel2Url, item.panel3Url, item.panel4Url].map(
-                      (src) => (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          key={src}
-                          src={src}
-                          alt=""
-                          className="h-12 w-9 rounded object-cover"
-                        />
-                      )
-                    )}
-                  </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.imageUrl}
+                    alt=""
+                    className="h-16 w-12 rounded object-cover object-top"
+                  />
                 </td>
                 <td className="px-4 py-3">{item.title}</td>
                 <td className="px-4 py-3">{item.published ? "公開" : "下書き"}</td>

@@ -86,10 +86,7 @@ export type CashFlowSide = {
 export type ComicStripDTO = {
   id: string;
   title: string;
-  panel1Url: string;
-  panel2Url: string;
-  panel3Url: string;
-  panel4Url: string;
+  imageUrl: string;
   published: boolean;
   sortOrder: number;
 };

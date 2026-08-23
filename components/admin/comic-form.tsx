@@ -17,18 +17,8 @@ function SubmitButton({ editing }: { editing: boolean }) {
   );
 }
 
-const PANELS = [
-  { file: "panel1File", url: "panel1Url", label: "1コマ目" },
-  { file: "panel2File", url: "panel2Url", label: "2コマ目" },
-  { file: "panel3File", url: "panel3Url", label: "3コマ目" },
-  { file: "panel4File", url: "panel4Url", label: "4コマ目" },
-] as const;
-
 export function ComicForm({ initial }: { initial?: ComicStripDTO }) {
   const [state, action] = useActionState(upsertComicStripAction, {});
-  const urls = initial
-    ? [initial.panel1Url, initial.panel2Url, initial.panel3Url, initial.panel4Url]
-    : [];
 
   return (
     <form action={action} className="grid gap-4 md:grid-cols-2">
@@ -47,37 +37,35 @@ export function ComicForm({ initial }: { initial?: ComicStripDTO }) {
           defaultValue={initial?.sortOrder ?? 0}
         />
       </div>
-      {PANELS.map((panel, index) => (
-        <div key={panel.file} className="space-y-1.5">
-          <Label htmlFor={panel.file}>{panel.label}</Label>
-          {urls[index] ? (
-            <p className="mb-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={urls[index]}
-                alt=""
-                className="h-28 w-auto rounded-xl object-cover ring-1 ring-sky-200"
-              />
-            </p>
-          ) : null}
-          <Input
-            id={panel.file}
-            name={panel.file}
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-          />
-          <Input
-            name={panel.url}
-            type="text"
-            defaultValue={urls[index] ?? ""}
-            placeholder="/brand/yonkoma-1.jpg または https://"
-          />
-        </div>
-      ))}
-      <p className="text-xs text-muted-foreground md:col-span-2">
-        4枚すべて必要です。ファイルを選ぶと Storage に上げます。ローカルの
-        `/brand/...` や公開URLでも登録できます。JPEG / PNG / WebP / GIF、5MBまで。
-      </p>
+      <div className="space-y-1.5 md:col-span-2">
+        <Label htmlFor="imageFile">4コマ画像（1枚）</Label>
+        {initial?.imageUrl ? (
+          <p className="mb-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={initial.imageUrl}
+              alt=""
+              className="h-40 w-auto rounded-xl object-cover ring-1 ring-sky-200"
+            />
+          </p>
+        ) : null}
+        <Input
+          id="imageFile"
+          name="imageFile"
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+        />
+        <Input
+          name="imageUrl"
+          type="text"
+          defaultValue={initial?.imageUrl ?? ""}
+          placeholder="/brand/yonkoma-ops-fee.jpg または https://"
+        />
+        <p className="text-xs text-muted-foreground">
+          4コマを縦に並べた1枚を登録します。ファイルを選ぶと Storage に上げます。JPEG /
+          PNG / WebP / GIF、5MBまで。
+        </p>
+      </div>
       <label className="flex items-center gap-2 text-sm md:col-span-2">
         <input
           type="checkbox"

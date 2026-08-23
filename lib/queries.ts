@@ -166,20 +166,14 @@ export async function listProjects(): Promise<ProjectDTO[]> {
 function toComicStripDTO(row: {
   id: string;
   title: string;
-  panel1Url: string;
-  panel2Url: string;
-  panel3Url: string;
-  panel4Url: string;
+  imageUrl: string;
   published: boolean;
   sortOrder: number;
 }): ComicStripDTO {
   return {
     id: row.id,
     title: row.title,
-    panel1Url: row.panel1Url,
-    panel2Url: row.panel2Url,
-    panel3Url: row.panel3Url,
-    panel4Url: row.panel4Url,
+    imageUrl: row.imageUrl,
     published: row.published,
     sortOrder: row.sortOrder,
   };

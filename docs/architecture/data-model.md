@@ -52,8 +52,7 @@ erDiagram
   ComicStrip {
     string id PK
     string title
-    string panel1Url
-    string panel4Url
+    string imageUrl
     boolean published
     int sortOrder
   }
@@ -151,15 +150,12 @@ erDiagram
 
 ## ComicStrip
 
-紹介ページの4コマ作品。1行が4枚。
+紹介ページの4コマ作品。1行が縦4コマの画像1枚。
 
 | 列 | 型 | 必須 | 値 |
 |----|----|------|-----|
 | title | text | yes | 作品タイトル |
-| panel1Url | text | yes | 1コマ目の公開URLまたは `/brand/...` |
-| panel2Url | text | yes | |
-| panel3Url | text | yes | |
-| panel4Url | text | yes | |
+| imageUrl | text | yes | 4コマ1枚の公開URLまたは `/brand/...` |
 | published | bool | yes | false なら公開しない |
 | sortOrder | int | yes | 小さいほど上。既定 0 |
 

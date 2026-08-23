@@ -174,10 +174,7 @@ async function main() {
   await prisma.comicStrip.create({
     data: {
       title: "運用代、稼がなきゃ",
-      panel1Url: "/brand/yonkoma-1.jpg",
-      panel2Url: "/brand/yonkoma-2.jpg",
-      panel3Url: "/brand/yonkoma-3.jpg",
-      panel4Url: "/brand/yonkoma-4.jpg",
+      imageUrl: "/brand/yonkoma-ops-fee.jpg",
       published: true,
       sortOrder: 0,
     },
