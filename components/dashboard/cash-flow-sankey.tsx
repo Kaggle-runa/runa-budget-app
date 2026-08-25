@@ -121,12 +121,15 @@ export function CashFlowSankey({ graph }: { graph: CashFlowGraph }) {
 
   return (
     <div>
-      <div className="hidden md:block">
+      <p className="mb-2 text-xs text-zinc-500 md:hidden">
+        グラフは横にスライドして見てね。左が入り、右が出てるよ。
+      </p>
+      <div className="overflow-x-auto pb-1">
         <svg
           viewBox={`0 0 ${layout.width} ${layout.height}`}
-          className="h-auto w-full"
+          className="h-auto w-full min-w-[720px] md:min-w-0"
           role="img"
-          aria-label="収支の流れ"
+          aria-label="収支の流れ。左が収入とマスター借入、右が支出と現金"
         >
           {layout.left.map((node, index) => (
             <path
@@ -235,11 +238,6 @@ export function CashFlowSankey({ graph }: { graph: CashFlowGraph }) {
           ))}
         </svg>
       </div>
-
-      <div className="grid gap-6 md:hidden">
-        <FlowList title="収入" nodes={graph.left} total={graph.total} />
-        <FlowList title="支出と残高" nodes={graph.right} total={graph.total} />
-      </div>
     </div>
   );
 }
@@ -300,37 +298,5 @@ function NodeLabel({
         {detail}
       </text>
     </>
-  );
-}
-
-function FlowList({
-  title,
-  nodes,
-  total,
-}: {
-  title: string;
-  nodes: CashFlowSide[];
-  total: number;
-}) {
-  return (
-    <div>
-      <p className="mb-2 text-sm font-medium text-zinc-500">{title}</p>
-      <ul className="space-y-2">
-        {nodes.map((node) => (
-          <li key={node.key} className="flex items-center justify-between gap-3 text-sm">
-            <span className="flex items-center gap-2">
-              <span
-                className="h-2.5 w-2.5 rounded-full"
-                style={{ background: KIND_COLOR[node.kind] }}
-              />
-              {node.label}
-            </span>
-            <span className="tabular-nums text-zinc-600">
-              {formatYen(node.amount)}（{percent(node.amount, total)}）
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }

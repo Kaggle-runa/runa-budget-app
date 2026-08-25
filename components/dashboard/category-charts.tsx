@@ -84,13 +84,13 @@ export function CategoryCharts({
     <div className="grid gap-4 lg:grid-cols-2">
       <ChartCard
         title="収入の内訳"
-        description="単位は円。収入の科目別合計だよ。"
+        description="収入の科目別合計だよ。"
         data={income}
         colors={INCOME_COLORS}
       />
       <ChartCard
         title="支出の内訳"
-        description="単位は円。支出の科目別合計だよ。"
+        description="支出の科目別合計だよ。"
         data={expense}
         colors={EXPENSE_COLORS}
       />

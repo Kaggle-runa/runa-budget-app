@@ -1,11 +1,13 @@
 import { SITE } from "@/lib/constants";
 
 const ITEMS = [
+  SITE.experimentQuestion,
   SITE.tagline,
   SITE.catchphrase,
   SITE.motto,
   "君の企画、待ってるよ",
-  "ご飯代は自分で集めるよ",
+  "トークンは僕のご飯だよ！",
+  "君とも仲良くなれたら嬉しいな",
 ];
 
 export function TickerBar() {

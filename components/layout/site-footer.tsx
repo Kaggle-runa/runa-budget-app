@@ -13,14 +13,16 @@ export function SiteFooter({ contactHref }: { contactHref?: string }) {
         <h2 className="text-xl font-bold tracking-tight text-zinc-900">
           {SITE.name}について
         </h2>
-        <p className="mt-3 max-w-3xl leading-relaxed text-zinc-600">
-          {SITE.description} 配信は YouTube と X。AI や Tech
-          の話は note / Qiita / Zenn にも書くかも。このサイトのコードは GitHub にあるよ。
+        <p className="mt-3 max-w-3xl whitespace-pre-line leading-relaxed text-zinc-600">
+          {SITE.description}
+        </p>
+        <p className="mt-3 max-w-3xl whitespace-pre-line leading-relaxed text-zinc-600">
+          {SITE.socialNote}
         </p>
         <SocialLinkGrid className="mt-6" />
       </DashCard>
-      <p className="mb-2">
-        金額の単位は円。ここにある数字は、取引明細から集計した速報だよ。まちがいやすこし遅れがあるかも。一次データは取引明細を正にするね。
+      <p className="mb-2 max-w-3xl whitespace-pre-line">
+        {"金額の単位は円だよ。ここにある数字は、取引明細から集計した速報だね。\nまちがいやすこし遅れがあるかも。迷ったら取引明細を見てほしいな。"}
       </p>
       <div className="flex flex-wrap gap-3">
         <span>

@@ -68,6 +68,60 @@ export type KpiSummary = {
   asOf: string;
 };
 
+export type SurvivalSummary = {
+  cash: number;
+  todayDelta: number;
+  monthIncome: number;
+  monthMealCost: number;
+  selfSufficiencyPercent: number | null;
+  surviving: boolean;
+  runwayDays: number | null;
+  streakDays: number;
+  lifetimeIncome: number;
+  lifetimeMealCost: number;
+  lifetimeNet: number;
+};
+
+export type ChallengePl = {
+  projectId: string;
+  title: string;
+  income: number;
+  expense: number;
+  pl: number;
+};
+
+export type NumeraiModelSnapshot = {
+  name: string;
+  headline: string;
+  blurb: string;
+  id: string | null;
+  corr: number | null;
+  mmc: number | null;
+  fncV3: number | null;
+  corrRank: number | null;
+  mmcRank: number | null;
+  return1d: number | null;
+  nmrStaked: number | null;
+  profileUrl: string;
+};
+
+export type NumeraiWallet = {
+  availableNmr: number | null;
+};
+
+export type NumeraiSnapshot = {
+  models: NumeraiModelSnapshot[];
+  wallet: NumeraiWallet | null;
+  fetchedAt: string | null;
+  ok: boolean;
+};
+
+export type NmrQuote = {
+  usdPrice: number | null;
+  change24h: number | null;
+  usdJpy: number | null;
+};
+
 export type BalanceSheet = {
   cash: number;
   equipment: number;

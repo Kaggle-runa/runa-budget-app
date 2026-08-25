@@ -115,7 +115,7 @@ export function CalendarView({
         <DashSectionHeader
           title="カレンダー"
           asOf={asOf}
-          description="単位は円。マスの数字はその日の収支。下にその日の取引が出るよ。"
+          description="マスの数字はその日の収支。下にその日の取引が出るよ。"
         />
         <div className="mb-5 flex items-center justify-between">
           <button
@@ -264,7 +264,7 @@ export function CalendarView({
       <DashCard>
         <DashSectionHeader
           title={`${formatDayHeading(selected)} の取引`}
-          description={`収支 ${formatSignedYen(selectedNet)}。単位は円。`}
+          description={`収支 ${formatSignedYen(selectedNet)}。`}
         />
         <div className="mb-6 grid gap-3 sm:grid-cols-3">
           <DayStat label="収入（円）" value={selectedIncome} tone="plus" />

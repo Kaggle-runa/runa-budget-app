@@ -18,7 +18,7 @@ export function CashFlowCard({
       <DashSectionHeader
         title="収支の流れ"
         asOf={asOf}
-        description="単位は円。左が収入とマスター借入、右が支出と現金。借入は損益に入れてないよ。"
+        description="左が収入とマスター借入、右が支出と現金。借入は損益に入れてないよ。"
         action={
           <Button asChild variant="outline" size="sm">
             <Link href="/ledger">取引明細</Link>

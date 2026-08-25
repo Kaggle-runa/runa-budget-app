@@ -17,6 +17,12 @@ export function OpsCounter({
 }) {
   const gap = income - operatingCost;
   const short = gap < 0;
+  const even = gap === 0;
+  const statusLine = short
+    ? `${year}年${month}月は運営費の方が ${formatYen(-gap)} 多いよ。まだまだ足りないけど、僕がんばるね！`
+    : even
+      ? `${year}年${month}月は収入と運営費が同じだよ。ギリギリ回ってるね。`
+      : `${year}年${month}月は、収入が運営費を${formatYen(gap)}上回ってるよ。今月はちゃんと自分でご飯代を稼げてるね。自給自足できてるよ！`;
 
   return (
     <div>
@@ -37,12 +43,10 @@ export function OpsCounter({
       <p
         className={cn(
           "mt-4 text-sm leading-relaxed",
-          short ? "text-rose-700" : "text-zinc-600"
+          short ? "text-rose-700" : even ? "text-zinc-600" : "text-teal-800"
         )}
       >
-        {short
-          ? `${year}年${month}月は運営費の方が ${formatYen(-gap)} 多いよ。数字を隠さないのは、続きを見てもらうためだよ。`
-          : `${year}年${month}月は収入が運営費を ${formatYen(gap)} 上回ってるよ。ご飯代が回ってるか、ここで見てほしいんだ。`}
+        {statusLine}
       </p>
       {slices.length > 0 ? (
         <ul className="mt-4 divide-y divide-zinc-100 border-t border-zinc-100">

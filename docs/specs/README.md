@@ -14,6 +14,8 @@ docs/specs/
 ├── idea-submissions/
 ├── announcements/
 ├── yonkoma/
+├── survival-experiment/
+├── live-status/
 ├── contact/
 ├── admin/
 ├── motion/

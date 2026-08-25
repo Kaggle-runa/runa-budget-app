@@ -29,9 +29,9 @@ function SheetColumn({
 }) {
   const visible = blocks.filter((block) => block.amount > 0);
   return (
-    <div className="flex min-h-[220px] flex-col">
+    <div className="flex min-h-[180px] flex-col sm:min-h-[220px]">
       <p className="mb-2 text-sm font-medium text-zinc-500">{title}</p>
-      <div className="flex min-h-[180px] flex-1 flex-col overflow-hidden rounded-2xl">
+      <div className="flex min-h-[140px] flex-1 flex-col overflow-hidden rounded-2xl sm:min-h-[180px]">
         {visible.length === 0 ? (
           <div className="flex flex-1 items-center justify-center bg-zinc-50 text-sm text-zinc-400">
             0円
@@ -44,23 +44,23 @@ function SheetColumn({
               <div
                 key={block.key}
                 className={cn(
-                  "flex px-4 text-white",
+                  "flex px-2 text-white sm:px-4",
                   compact
-                    ? "min-h-10 items-center justify-between"
-                    : "min-h-24 flex-col items-center justify-center text-center"
+                    ? "min-h-9 items-center justify-between sm:min-h-10"
+                    : "min-h-16 flex-col items-center justify-center text-center sm:min-h-24"
                 )}
                 style={{
                   flexGrow: Math.max(block.amount, 1),
                   background: block.color,
                 }}
               >
-                <p className={cn("font-medium", compact ? "text-sm" : "text-base")}>
+                <p className={cn("font-medium", compact ? "text-xs sm:text-sm" : "text-sm sm:text-base")}>
                   {block.label}
                 </p>
                 <p
                   className={cn(
                     "tabular-nums font-semibold tracking-tight",
-                    compact ? "text-sm" : "mt-1 text-2xl"
+                    compact ? "text-xs sm:text-sm" : "mt-0.5 text-lg sm:mt-1 sm:text-2xl"
                   )}
                 >
                   {formatYen(block.amount)}
@@ -105,7 +105,7 @@ export function BalanceSheetView({ sheet }: { sheet: BalanceSheetData }) {
 
   return (
     <div>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-2 gap-2 sm:gap-4">
         <SheetColumn
           title="資産"
           total={sheet.assets}

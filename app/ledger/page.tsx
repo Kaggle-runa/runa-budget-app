@@ -18,7 +18,7 @@ export default async function LedgerPage() {
           <DashSectionHeader
             title="取引明細"
             asOf={latest ? formatAsOf(latest) : undefined}
-            description="単位は円。一次データだよ。新しい取引から並べてるよ。"
+            description="一次データだよ。新しい取引から並べてるよ。"
           />
         </div>
         <TransactionTable transactions={transactions} />

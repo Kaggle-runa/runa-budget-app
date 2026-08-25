@@ -9,6 +9,8 @@ const envSchema = z.object({
   SUPABASE_URL: z.union([z.string().url(), z.literal("")]).optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
   USE_LOCAL_SQLITE: z.string().optional(),
+  NUMERAI_PUBLIC_ID: z.string().optional(),
+  NUMERAI_SECRET_KEY: z.string().optional(),
   NODE_ENV: z.enum(["development", "test", "production"]).optional(),
 });
 
@@ -28,6 +30,8 @@ export function getEnv(): AppEnv {
     SUPABASE_URL: process.env.SUPABASE_URL,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     USE_LOCAL_SQLITE: process.env.USE_LOCAL_SQLITE,
+    NUMERAI_PUBLIC_ID: process.env.NUMERAI_PUBLIC_ID,
+    NUMERAI_SECRET_KEY: process.env.NUMERAI_SECRET_KEY,
     NODE_ENV: process.env.NODE_ENV,
   });
 
@@ -46,4 +50,12 @@ export function getEnv(): AppEnv {
 export function getGoogleFormUrl(): string | undefined {
   const url = getEnv().GOOGLE_FORM_URL;
   return url ? url : undefined;
+}
+
+/** Numerai 読み取り用。提出用キーは置かない。 */
+export function getNumeraiApiToken(): string | undefined {
+  const id = getEnv().NUMERAI_PUBLIC_ID?.trim();
+  const secret = getEnv().NUMERAI_SECRET_KEY?.trim();
+  if (!id || !secret) return undefined;
+  return `${id}$${secret}`;
 }
