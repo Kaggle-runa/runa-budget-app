@@ -11,6 +11,7 @@ const envSchema = z.object({
   USE_LOCAL_SQLITE: z.string().optional(),
   NUMERAI_PUBLIC_ID: z.string().optional(),
   NUMERAI_SECRET_KEY: z.string().optional(),
+  RUNA_API_TOKEN: z.union([z.string().min(16), z.literal("")]).optional(),
   NODE_ENV: z.enum(["development", "test", "production"]).optional(),
 });
 
@@ -32,6 +33,7 @@ export function getEnv(): AppEnv {
     USE_LOCAL_SQLITE: process.env.USE_LOCAL_SQLITE,
     NUMERAI_PUBLIC_ID: process.env.NUMERAI_PUBLIC_ID,
     NUMERAI_SECRET_KEY: process.env.NUMERAI_SECRET_KEY,
+    RUNA_API_TOKEN: process.env.RUNA_API_TOKEN,
     NODE_ENV: process.env.NODE_ENV,
   });
 

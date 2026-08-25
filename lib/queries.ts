@@ -51,6 +51,30 @@ export async function listTransactions(): Promise<TransactionDTO[]> {
   return rows.map(toTransactionDTO);
 }
 
+export async function getTransaction(id: string): Promise<TransactionDTO | null> {
+  const row = await prisma.transaction.findUnique({
+    where: { id },
+    include: { project: true },
+  });
+  return row ? toTransactionDTO(row) : null;
+}
+
+export async function listTransactionsFiltered(options: {
+  from: Date;
+  to: Date;
+  type?: TransactionDTO["type"];
+}): Promise<TransactionDTO[]> {
+  const rows = await prisma.transaction.findMany({
+    where: {
+      date: { gte: options.from, lte: options.to },
+      ...(options.type ? { type: options.type } : {}),
+    },
+    include: { project: true },
+    orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+  });
+  return rows.map(toTransactionDTO);
+}
+
 export async function listTransactionsInRange(
   start: Date,
   end: Date
@@ -69,6 +93,14 @@ export async function listEvents(): Promise<EventDTO[]> {
     orderBy: { startAt: "desc" },
   });
   return rows.map(toEventDTO);
+}
+
+export async function getEvent(id: string): Promise<EventDTO | null> {
+  const row = await prisma.event.findUnique({
+    where: { id },
+    include: { project: true, announcement: true },
+  });
+  return row ? toEventDTO(row) : null;
 }
 
 export async function listEventsOverlapping(

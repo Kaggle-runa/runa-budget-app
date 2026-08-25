@@ -24,6 +24,7 @@ llm-game の kawaii-tech（ピンク / 紫 / シアン、ガラスカード、sp
 - `ADMIN_SECRET` で HMAC-SHA256 署名した httpOnly Cookie（7日）
 - `middleware.ts` が `/admin/*`（`/admin/login` 以外）を保護
 - 各 Server Action でも `requireAdmin()` する
+- `/api/v1` は `RUNA_API_TOKEN` の Bearer。正本は `docs/api/openapi.yaml`
 
 ## 更新の見え方
 

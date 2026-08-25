@@ -18,6 +18,7 @@
 | 11 | 4コマ漫画 | `/`, `/admin/yonkoma` | [yonkoma](../specs/yonkoma/) | as-built |
 | 12 | 生存実験の実況 | `/` | [survival-experiment](../specs/survival-experiment/) | as-built |
 | 13 | Numerai モデル | `/numerai` | [live-status](../specs/live-status/) | 一部 |
+| 14 | 機械向け API | `/api/v1` | [machine-api](../specs/machine-api/) | as-built |
 
 ## 各機能の要点
 
@@ -75,6 +76,10 @@ Next.js 1本を Render に載せる。DB は Supabase Postgres。
 ### 13. Numerai モデル
 
 `runa_version1` と `runa_version2` の公開成績。`/numerai` は説明ページではなく観察ページ（ヒーローの Stake 円 → モデル → ひとこと → 短い説明）。損益・自給率には入れない。
+
+### 14. 機械向け API
+
+LLM / 外部スクリプトが明細・予定を JSON で登録し、現状を読む。正本は [openapi.yaml](../api/openapi.yaml)。Bearer `RUNA_API_TOKEN`。管理画面は残す。公開 JSON は無い。NMR の円は `status` に出すが損益には入れない。
 
 ## 第1版でやらないこと
 

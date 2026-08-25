@@ -24,5 +24,7 @@ services:
         sync: false
       - key: NUMERAI_SECRET_KEY
         sync: false
+      - key: RUNA_API_TOKEN
+        sync: false
       - key: NODE_ENV
         value: production

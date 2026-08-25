@@ -1,0 +1,328 @@
+openapi: 3.1.0
+info:
+  title: 華繰ルナ 公開家計簿 API
+  version: "1.0.0"
+  description: |
+    LLM / 外部スクリプト向け。視聴者向け HTML とは別。
+
+    使い方:
+    1. GET /api/v1/meta で科目を覚える
+    2. GET /api/v1/status で今の数字を読む
+    3. 必要なら明細・予定を日付で取る
+    4. 登録するときだけ POST
+
+    認証: `Authorization: Bearer <RUNA_API_TOKEN>`
+    単位: 円の整数。日付: yyyy-MM-dd。日時: ISO 8601（推奨 Asia/Tokyo）
+    NMR の円は評価額。損益・自給率・所持金（現金）には入れない。
+servers:
+  - url: http://localhost:3000
+    description: ローカル
+  - url: /
+    description: このサイト
+security:
+  - bearerAuth: []
+tags:
+  - name: meta
+  - name: status
+  - name: projects
+  - name: transactions
+  - name: events
+paths:
+  /api/v1/meta:
+    get:
+      tags: [meta]
+      summary: 科目と種別の辞書。最初に読む
+      responses:
+        "200":
+          description: 辞書
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/v1/status:
+    get:
+      tags: [status]
+      summary: 生存KPI・NMR円・直近の明細と予定。施策を考える入口
+      responses:
+        "200":
+          description: 現状。nmr.includedInProfit は常に false
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/v1/projects:
+    get:
+      tags: [projects]
+      summary: 企画一覧。取引・予定の projectId に使う
+      responses:
+        "200":
+          description: "{ projects: Project[] }"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/v1/transactions:
+    get:
+      tags: [transactions]
+      summary: 明細一覧
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date }
+          description: 開始日 yyyy-MM-dd。省略時は90日前
+        - in: query
+          name: to
+          schema: { type: string, format: date }
+          description: 終了日 yyyy-MM-dd。省略時は今日（日本時間）
+        - in: query
+          name: type
+          schema:
+            $ref: "#/components/schemas/TxType"
+      responses:
+        "200":
+          description: "{ transactions: Transaction[] }"
+        "400":
+          $ref: "#/components/responses/Error"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [transactions]
+      summary: 明細作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionWrite"
+            example:
+              date: "2026-08-26"
+              type: expense
+              category: llm_api
+              amount: 184
+              title: Claude API
+              memo: null
+              projectId: null
+      responses:
+        "201":
+          description: 作成した明細
+        "400":
+          $ref: "#/components/responses/Error"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/Error"
+  /api/v1/transactions/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [transactions]
+      summary: 明細1件
+      responses:
+        "200":
+          description: 明細
+        "404":
+          $ref: "#/components/responses/Error"
+    patch:
+      tags: [transactions]
+      summary: 明細更新（送った項目だけ）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionPatch"
+      responses:
+        "200":
+          description: 更新後の明細
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+        "422":
+          $ref: "#/components/responses/Error"
+    delete:
+      tags: [transactions]
+      summary: 明細削除
+      responses:
+        "200":
+          description: "{ ok: true, id }"
+        "404":
+          $ref: "#/components/responses/Error"
+        "422":
+          $ref: "#/components/responses/Error"
+  /api/v1/events:
+    get:
+      tags: [events]
+      summary: 予定一覧（期間と重なるもの）
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date }
+          description: 省略時は60日前
+        - in: query
+          name: to
+          schema: { type: string, format: date }
+          description: 省略時は今日
+      responses:
+        "200":
+          description: "{ events: Event[] }"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [events]
+      summary: 予定作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventWrite"
+            example:
+              title: 配信
+              startAt: "2026-08-28T20:00:00+09:00"
+              endAt: "2026-08-28T22:00:00+09:00"
+              allDay: false
+              kind: stream
+              body: null
+              linkUrl: null
+              projectId: null
+              announcementId: null
+      responses:
+        "201":
+          description: 作成した予定
+        "400":
+          $ref: "#/components/responses/Error"
+  /api/v1/events/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [events]
+      summary: 予定1件
+      responses:
+        "200":
+          description: 予定
+        "404":
+          $ref: "#/components/responses/Error"
+    patch:
+      tags: [events]
+      summary: 予定更新（送った項目だけ）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventPatch"
+      responses:
+        "200":
+          description: 更新後の予定
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+    delete:
+      tags: [events]
+      summary: 予定削除
+      responses:
+        "200":
+          description: "{ ok: true, id }"
+        "404":
+          $ref: "#/components/responses/Error"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    Id:
+      in: path
+      name: id
+      required: true
+      schema: { type: string }
+  responses:
+    Unauthorized:
+      description: トークンが無い・違う。未設定のときは 503 TOKEN_UNSET
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Error:
+      description: エラー
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    TxType:
+      type: string
+      enum: [income, expense, loan, repay, capex]
+    EventKind:
+      type: string
+      enum: [stream, release, project, other]
+    TransactionWrite:
+      type: object
+      required: [date, type, amount, category, title]
+      properties:
+        date:
+          type: string
+          format: date
+        type:
+          $ref: "#/components/schemas/TxType"
+        amount:
+          type: integer
+          minimum: 1
+          description: 円。常に正
+        category:
+          type: string
+          description: |
+            income: ads, superchat, merch, affiliate, support, ai_hustle
+            expense: llm_api, voice, hosting, tools, other
+            loan: master_loan
+            repay: master_repay
+            capex: equipment
+        title:
+          type: string
+          maxLength: 80
+        memo:
+          type: [string, "null"]
+        projectId:
+          type: [string, "null"]
+    TransactionPatch:
+      type: object
+      description: 更新する項目だけ送る
+      properties:
+        date: { type: string, format: date }
+        type:
+          $ref: "#/components/schemas/TxType"
+        amount: { type: integer, minimum: 1 }
+        category: { type: string }
+        title: { type: string }
+        memo: { type: [string, "null"] }
+        projectId: { type: [string, "null"] }
+    EventWrite:
+      type: object
+      required: [title, startAt, endAt, kind]
+      properties:
+        title: { type: string, maxLength: 80 }
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        allDay: { type: boolean }
+        kind:
+          $ref: "#/components/schemas/EventKind"
+        body: { type: [string, "null"] }
+        linkUrl: { type: [string, "null"] }
+        projectId: { type: [string, "null"] }
+        announcementId: { type: [string, "null"] }
+    EventPatch:
+      type: object
+      description: 更新する項目だけ送る
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [TOKEN_UNSET, UNAUTHORIZED, VALIDATION, SOLVENCY, NOT_FOUND, INTERNAL]
+            message: { type: string }
+            hint: { type: string }

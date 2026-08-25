@@ -56,6 +56,7 @@ npm run dev
 
 - 公開: http://localhost:3000
 - 管理: http://localhost:3000/admin/login （初期パスワードは `.env` の `ADMIN_PASSWORD`）
+- 機械向け API: [docs/api/openapi.yaml](docs/api/openapi.yaml)（`RUNA_API_TOKEN`）
 
 ```bash
 npm run lint
@@ -74,6 +75,9 @@ npm run typecheck
 | `GOOGLE_FORM_URL` | 問い合わせの Google フォーム（任意） |
 | `SUPABASE_URL` | お知らせ画像の Storage（任意） |
 | `SUPABASE_SERVICE_ROLE_KEY` | Storage アップロード用。公開しない |
+| `NUMERAI_PUBLIC_ID` | Numerai 読み取り（任意） |
+| `NUMERAI_SECRET_KEY` | Numerai 読み取り（任意） |
+| `RUNA_API_TOKEN` | `/api/v1` の Bearer。16文字以上。未設定なら API は 503 |
 
 新しい変数は `.env.example` と `lib/env.ts` に必ず足す。
 

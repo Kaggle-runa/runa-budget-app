@@ -2,9 +2,8 @@
 
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/session";
-import { EVENT_KINDS } from "@/lib/categories";
-import { prisma } from "@/lib/db";
 import { revalidatePublic } from "@/lib/actions/revalidate";
+import { removeEvent, saveEvent } from "@/lib/events";
 
 const eventSchema = z.object({
   id: z.string().optional(),
@@ -43,47 +42,28 @@ export async function upsertEventAction(
     return { error: parsed.error.issues[0]?.message ?? "入力が不正です" };
   }
 
-  if (!(parsed.data.kind in EVENT_KINDS)) {
-    return { error: "種別が不正です" };
-  }
-
-  const allDay = parsed.data.allDay === "true";
-  const startAt = new Date(parsed.data.startAt);
-  const endAt = new Date(parsed.data.endAt);
-  if (Number.isNaN(startAt.getTime()) || Number.isNaN(endAt.getTime())) {
-    return { error: "日時が不正です" };
-  }
-  if (endAt < startAt) {
-    return { error: "終了は開始以降にしてください" };
-  }
-
-  try {
-    const data = {
-      title: parsed.data.title,
-      startAt,
-      endAt,
-      allDay,
-      kind: parsed.data.kind,
-      projectId: parsed.data.projectId || null,
-      body: parsed.data.body?.trim() || null,
-      linkUrl: parsed.data.linkUrl || null,
-      announcementId: parsed.data.announcementId || null,
-    };
-    if (parsed.data.id) {
-      await prisma.event.update({ where: { id: parsed.data.id }, data });
-    } else {
-      await prisma.event.create({ data });
-    }
-    revalidatePublic();
-    return {};
-  } catch (error) {
-    console.error("upsertEventAction failed", error);
-    return { error: "保存に失敗しました" };
-  }
+  const saved = await saveEvent({
+    id: parsed.data.id,
+    title: parsed.data.title,
+    startAt: parsed.data.startAt,
+    endAt: parsed.data.endAt,
+    allDay: parsed.data.allDay === "true",
+    kind: parsed.data.kind,
+    projectId: parsed.data.projectId || null,
+    body: parsed.data.body || null,
+    linkUrl: parsed.data.linkUrl || null,
+    announcementId: parsed.data.announcementId || null,
+  });
+  if (!saved.ok) return { error: saved.message };
+  revalidatePublic();
+  return {};
 }
 
 export async function deleteEventAction(id: string): Promise<void> {
   await requireAdmin();
-  await prisma.event.delete({ where: { id } });
+  const removed = await removeEvent(id);
+  if (!removed.ok) {
+    throw new Error(removed.message);
+  }
   revalidatePublic();
 }

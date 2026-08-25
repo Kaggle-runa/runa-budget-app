@@ -12,6 +12,7 @@ Next.js 1プロセス + Supabase Postgres。詳細は `docs/architecture/deploy.
 | `DIRECT_URL` | migrate / db push |
 | `ADMIN_PASSWORD` | 管理ログイン |
 | `ADMIN_SECRET` | Cookie 署名 |
+| `RUNA_API_TOKEN` | `/api/v1` Bearer（任意。未設定なら API は 503） |
 
 ## コンポーネント
 

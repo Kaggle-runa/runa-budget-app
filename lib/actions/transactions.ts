@@ -2,11 +2,9 @@
 
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/session";
-import { categoriesForType } from "@/lib/categories";
-import { prisma } from "@/lib/db";
 import { revalidatePublic } from "@/lib/actions/revalidate";
-import { balanceSheet, toTransactionDTO } from "@/lib/finance";
-import type { TransactionDTO, TxType } from "@/types/domain";
+import { removeTransaction, saveTransaction } from "@/lib/transactions";
+import type { TxType } from "@/types/domain";
 
 const transactionSchema = z.object({
   id: z.string().optional(),
@@ -18,31 +16,6 @@ const transactionSchema = z.object({
   memo: z.string().max(400).optional().or(z.literal("")),
   projectId: z.string().optional().or(z.literal("")),
 });
-
-function assertCategory(type: TxType, category: string) {
-  const allowed = Object.keys(categoriesForType(type));
-  if (!allowed.includes(category)) {
-    throw new Error("カテゴリが不正です");
-  }
-}
-
-async function loadSheetRows(): Promise<TransactionDTO[]> {
-  const rows = await prisma.transaction.findMany({
-    include: { project: true },
-  });
-  return rows.map(toTransactionDTO);
-}
-
-function solvencyError(transactions: TransactionDTO[]): string | null {
-  const sheet = balanceSheet(transactions);
-  if (sheet.cash < 0) {
-    return "現金が不足するため、この内容では保存できません";
-  }
-  if (sheet.loan < 0) {
-    return "借入残高を超える返済は登録できません";
-  }
-  return null;
-}
 
 export async function upsertTransactionAction(
   _prev: { error?: string } | null,
@@ -64,59 +37,26 @@ export async function upsertTransactionAction(
     return { error: parsed.error.issues[0]?.message ?? "入力が不正です" };
   }
 
-  try {
-    assertCategory(parsed.data.type, parsed.data.category);
-    const nextRow: TransactionDTO = {
-      id: parsed.data.id ?? "preview",
-      date: parsed.data.date,
-      type: parsed.data.type,
-      amount: parsed.data.amount,
-      category: parsed.data.category,
-      title: parsed.data.title,
-      memo: parsed.data.memo || null,
-      projectId: parsed.data.projectId || null,
-      projectTitle: null,
-    };
-    const current = await loadSheetRows();
-    const next = parsed.data.id
-      ? current.map((row) => (row.id === parsed.data.id ? nextRow : row))
-      : [...current, nextRow];
-    const blocked = solvencyError(next);
-    if (blocked) return { error: blocked };
-
-    const data = {
-      date: new Date(`${parsed.data.date}T00:00:00`),
-      type: parsed.data.type,
-      amount: parsed.data.amount,
-      category: parsed.data.category,
-      title: parsed.data.title,
-      memo: parsed.data.memo || null,
-      projectId: parsed.data.projectId || null,
-    };
-    if (parsed.data.id) {
-      await prisma.transaction.update({
-        where: { id: parsed.data.id },
-        data,
-      });
-    } else {
-      await prisma.transaction.create({ data });
-    }
-    revalidatePublic();
-    return {};
-  } catch (error) {
-    console.error("upsertTransactionAction failed", error);
-    return { error: "保存に失敗しました" };
-  }
+  const saved = await saveTransaction({
+    id: parsed.data.id,
+    date: parsed.data.date,
+    type: parsed.data.type as TxType,
+    amount: parsed.data.amount,
+    category: parsed.data.category,
+    title: parsed.data.title,
+    memo: parsed.data.memo || null,
+    projectId: parsed.data.projectId || null,
+  });
+  if (!saved.ok) return { error: saved.message };
+  revalidatePublic();
+  return {};
 }
 
 export async function deleteTransactionAction(id: string): Promise<void> {
   await requireAdmin();
-  const current = await loadSheetRows();
-  const next = current.filter((row) => row.id !== id);
-  const blocked = solvencyError(next);
-  if (blocked) {
-    throw new Error(blocked);
+  const removed = await removeTransaction(id);
+  if (!removed.ok) {
+    throw new Error(removed.message);
   }
-  await prisma.transaction.delete({ where: { id } });
   revalidatePublic();
 }

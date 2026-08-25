@@ -47,3 +47,16 @@
 | `deleteIdeaAction` | `lib/actions/ideas.ts` | admin | 企画削除 |
 
 入力は zod で検証する。成功時は `revalidatePublic()` で公開ページを再検証する。
+
+## 機械向け API（`/api/v1`）
+
+正本は [openapi.yaml](./openapi.yaml)。Bearer `RUNA_API_TOKEN`。公開 JSON は無い。
+
+| パス | 概要 |
+|------|------|
+| `GET /api/v1/meta` | 科目・種別の辞書 |
+| `GET /api/v1/status` | 生存KPI + NMR円（損益には入れない）+ 直近明細・予定 |
+| `GET /api/v1/projects` | 企画一覧 |
+| `/api/v1/transactions` | 明細の一覧 / 作成 / 更新 / 削除 |
+| `/api/v1/events` | 予定の一覧 / 作成 / 更新 / 削除 |
+
