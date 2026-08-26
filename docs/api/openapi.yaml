@@ -13,7 +13,7 @@ info:
 
     認証: `Authorization: Bearer <RUNA_API_TOKEN>`
     単位: 円の整数。日付: yyyy-MM-dd。日時: ISO 8601（推奨 Asia/Tokyo）
-    NMR の円は評価額。損益・自給率・所持金（現金）には入れない。
+    NMR の円は評価額。総資産には入れる。損益・自給率・現金には入れない。
 servers:
   - url: http://localhost:3000
     description: ローカル
@@ -40,10 +40,10 @@ paths:
   /api/v1/status:
     get:
       tags: [status]
-      summary: 生存KPI・NMR円・直近の明細と予定。施策を考える入口
+      summary: 生存KPI・総資産・NMR円・直近の明細と予定。施策を考える入口
       responses:
         "200":
-          description: 現状。nmr.includedInProfit は常に false
+          description: 現状。assets.total は現金+機材+NMR円。nmr.includedInProfit は常に false
         "401":
           $ref: "#/components/responses/Unauthorized"
   /api/v1/projects:

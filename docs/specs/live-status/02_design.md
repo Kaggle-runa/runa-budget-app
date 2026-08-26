@@ -6,7 +6,7 @@
 |------|------|------|
 | `/numerai` | ルナのモデル観察 | ヒーロー（Stake総額）→ モデルカード → ルナのひとこと → Numerai の短い説明 |
 
-トップの「いまのルナの状況」は [dashboard](../dashboard/02_design.md) と [channel-home](../channel-home/02_design.md)。
+トップのヒーロー直下は総資産（現金 + 機材 + NMR円）。「いまのルナの状況」は [dashboard](../dashboard/02_design.md) と [channel-home](../channel-home/02_design.md)。
 
 ## `/numerai` の順序
 

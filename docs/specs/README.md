@@ -12,6 +12,7 @@ docs/specs/
 ├── calendar/
 ├── ledger/
 ├── idea-submissions/
+├── project-challenges/
 ├── announcements/
 ├── yonkoma/
 ├── survival-experiment/

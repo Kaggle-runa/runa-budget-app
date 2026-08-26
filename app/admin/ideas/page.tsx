@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { IDEA_STATUSES, ideaStatusLabel } from "@/lib/categories";
 import { formatDateDot } from "@/lib/format";
 import { deleteIdeaAction, updateIdeaStatusAction } from "@/lib/actions/ideas";
-import { listIdeas } from "@/lib/queries";
+import { listIdeas, listProjects } from "@/lib/queries";
 
 export default async function AdminIdeasPage() {
-  const ideas = await listIdeas();
+  const [ideas, projects] = await Promise.all([listIdeas(), listProjects()]);
 
   return (
     <>
@@ -37,6 +37,18 @@ export default async function AdminIdeasPage() {
                 {Object.entries(IDEA_STATUSES).map(([key, label]) => (
                   <option key={key} value={key}>
                     {label}
+                  </option>
+                ))}
+              </select>
+              <select
+                name="projectId"
+                defaultValue={idea.projectId ?? ""}
+                className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+              >
+                <option value="">挑戦なし</option>
+                {projects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.title}
                   </option>
                 ))}
               </select>

@@ -33,18 +33,19 @@
 
 | # | 機能名 | 概要 | 仕様書 |
 |---|--------|------|--------|
-| 1 | チャンネルトップ | 生存実験の問い、生存KPI、現在の挑戦、マスター説明 | docs/specs/channel-home/ / docs/specs/survival-experiment/ |
+| 1 | チャンネルトップ | 生存実験の問い、総資産、いまのルナの状況、現在の挑戦、マスター説明 | docs/specs/channel-home/ / docs/specs/survival-experiment/ |
 | 2 | 収支ダッシュボード | 今日のルナ、運営カウンター、貸借対照表、収支の流れ、月次推移、カテゴリ内訳 | docs/specs/dashboard/ / docs/specs/balance-sheet/ |
 | 3 | カレンダー | 日次損益 + 予定バッジ。選択日の明細 | docs/specs/calendar/ |
 | 4 | 取引明細 | 公開台帳（一次データ） | docs/specs/ledger/ |
 | 5 | 企画募集 | 視聴者投稿とステータス一覧 | docs/specs/idea-submissions/ |
+| 15 | 挑戦の実況 | 収益・トークン代・マスター介入 | docs/specs/project-challenges/ |
 | 6 | 管理画面 | ログイン、取引/予定/お知らせ/4コマ CRUD、企画モデレーション | docs/specs/admin/ |
 | 7 | お知らせ | 配信や更新のカード一覧 | docs/specs/announcements/ |
 | 8 | 問い合わせ | Googleフォームへ遷移 | docs/specs/contact/ |
 
 ## スコープ外（第1版でやらないこと）
 
-- 企画投票、マスター介入時間・自動化率、総資産（株 / FX / NMR）
+- 企画投票、マスター介入時間・自動化率、総資産への株 / FX
 - 視聴者資金の運用や売買指示の投票
 - 「AIで儲ける方法」コンテンツ
 - 銀行 / カード / YouTube API 連携

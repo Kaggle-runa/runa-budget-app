@@ -6,12 +6,14 @@ export function revalidatePublic(): void {
   revalidatePath("/calendar");
   revalidatePath("/ledger");
   revalidatePath("/ideas");
+  revalidatePath("/ideas", "layout");
   revalidatePath("/news");
   revalidatePath("/contact");
   revalidatePath("/admin");
   revalidatePath("/admin/transactions");
   revalidatePath("/admin/events");
   revalidatePath("/admin/ideas");
+  revalidatePath("/admin/projects");
   revalidatePath("/admin/announcements");
   revalidatePath("/admin/yonkoma");
 }

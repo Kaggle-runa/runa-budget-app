@@ -3,6 +3,8 @@ import type { ExpenseCategory } from "@/lib/categories";
 import { dateKey, signedLedgerAmount, summarizeMonth } from "@/lib/finance";
 import type {
   ChallengePl,
+  IdeaDTO,
+  MonthSurvivalTone,
   ProjectDTO,
   SurvivalSummary,
   TransactionDTO,
@@ -13,6 +15,9 @@ export const MEAL_CATEGORIES = new Set<ExpenseCategory>([
   "voice",
   "hosting",
 ]);
+
+/** 企画のトークン代。ご飯代からホスティングを除いたもの */
+export const TOKEN_CATEGORIES = new Set<ExpenseCategory>(["llm_api", "voice"]);
 
 /** 集計の「今日」は日本時間。Render が UTC でも月と日付がずれないようにする。 */
 export function todayInJapan(now = new Date()): Date {
@@ -94,6 +99,9 @@ export function summarizeSurvival(
   );
   const dailyMeal = last30Meal / 30;
   const cash = cashThrough(transactions, todayKey);
+  const equipment = transactions
+    .filter((tx) => tx.type === "capex" && tx.date <= todayKey)
+    .reduce((sum, tx) => sum + tx.amount, 0);
   const todayDelta = transactions
     .filter((tx) => tx.date === todayKey)
     .reduce((sum, tx) => sum + signedLedgerAmount(tx), 0);
@@ -112,6 +120,7 @@ export function summarizeSurvival(
 
   return {
     cash,
+    equipment,
     todayDelta,
     monthIncome: month.income,
     monthMealCost,
@@ -125,26 +134,75 @@ export function summarizeSurvival(
   };
 }
 
+export function monthSurvivalStatus(rate: number | null): {
+  tone: MonthSurvivalTone;
+  label: string;
+} {
+  if (rate === null) {
+    return { tone: "unknown", label: "今月のご飯代はまだ少ないよ" };
+  }
+  if (rate >= 100) {
+    return { tone: "ok", label: "今月は自力で生存中" };
+  }
+  return { tone: "short", label: "今月はご飯代が足りてないよ" };
+}
+
+export function totalAssetsYen(
+  cash: number,
+  equipment: number,
+  nmrYen: number | null
+): number {
+  return cash + equipment + (nmrYen ?? 0);
+}
+
 export function summarizeChallenges(
   transactions: TransactionDTO[],
   projects: ProjectDTO[]
 ): ChallengePl[] {
-  return projects
-    .filter((project) => project.status === "active")
-    .map((project) => {
+  return projects.map((project) => {
       const related = transactions.filter((tx) => tx.projectId === project.id);
       const income = related
         .filter((tx) => tx.type === "income")
         .reduce((sum, tx) => sum + tx.amount, 0);
-      const expense = related
-        .filter((tx) => tx.type === "expense")
+      const expenseRows = related.filter((tx) => tx.type === "expense");
+      const expense = expenseRows.reduce((sum, tx) => sum + tx.amount, 0);
+      const tokenCost = expenseRows
+        .filter((tx) => TOKEN_CATEGORIES.has(tx.category as ExpenseCategory))
         .reduce((sum, tx) => sum + tx.amount, 0);
       return {
         projectId: project.id,
         title: project.title,
+        status: project.status,
         income,
+        tokenCost,
+        otherExpense: expense - tokenCost,
         expense,
+        earned: income - tokenCost,
         pl: income - expense,
+        masterNote: project.masterNote,
+        overview: project.overview,
+        ideaId: null,
+        links: project.links,
       };
     });
+}
+
+export function attachChallengeIdeas(
+  challenges: ChallengePl[],
+  ideas: IdeaDTO[]
+): ChallengePl[] {
+  return challenges.map((challenge) => {
+    const idea = ideas.find((item) => item.projectId === challenge.projectId);
+    return { ...challenge, ideaId: idea?.id ?? null };
+  });
+}
+
+export function challengeHref(challenge: ChallengePl): string {
+  return challenge.ideaId
+    ? `/ideas/${challenge.ideaId}`
+    : `/ideas/p/${challenge.projectId}`;
+}
+
+export function ideaHasPublicDetail(status: string): boolean {
+  return status === "adopted" || status === "in_progress" || status === "done";
 }

@@ -10,6 +10,7 @@
 | 3 | カレンダー | `/calendar` | [calendar](../specs/calendar/) | as-built |
 | 4 | 取引明細 | `/ledger` | [ledger](../specs/ledger/) | as-built |
 | 5 | 企画募集 | `/ideas` | [idea-submissions](../specs/idea-submissions/) | as-built |
+| 15 | 挑戦の実況 | `/` ・ `/admin/projects` | [project-challenges](../specs/project-challenges/) | as-built |
 | 6 | お知らせ | `/news`, `/news/[id]` | [announcements](../specs/announcements/) | as-built |
 | 7 | 問い合わせ | `/contact` または外部フォーム | [contact](../specs/contact/) | as-built |
 | 8 | 管理画面 | `/admin/*` | [admin](../specs/admin/) | as-built |
@@ -24,7 +25,7 @@
 
 ### 1. チャンネルトップ
 
-実験の問い、ご飯代の説明、生存KPI、いまのルナの状況、現在の挑戦、マスター説明、立ち絵、お知らせ3件、4コマ、SNS。
+実験の問い、ご飯代の説明、総資産（現金 / NMR / 機材）、今月の生存ラベル、いまのルナの状況、現在の挑戦、Numerai入口、マスター説明、立ち絵、お知らせ3件、4コマ、SNS。
 
 ### 2. 収支ダッシュボード
 
@@ -39,11 +40,11 @@
 
 ### 4. 取引明細
 
-公開台帳。集計の一次データ。単位は円。時点は yyyy-MM-dd。
+公開台帳。集計の一次データ。単位は円。時点は yyyy-MM-dd。日付の新しい順 / 古い順と、企画での絞り込みができる。
 
 ### 5. 企画募集
 
-視聴者が投稿する。honeypot と IP レート制限あり。運営がステータスを変える。
+視聴者が投稿する。honeypot と IP レート制限あり。運営がステータスを変える。採用・実施中・完了は詳細ページ（結果と金額・明細の下に、企画の概要と note / YouTube の別カード）。採用した案は挑戦（Project）にしてトップで実況する。完了は企画ページの結果欄。
 
 ### 6. お知らせ
 
@@ -71,7 +72,7 @@ Next.js 1本を Render に載せる。DB は Supabase Postgres。
 
 ### 12. 生存実験の実況
 
-中心の問いは「僕は、自分で自分を養えるかな？」。所持金、今日の増減、今月の自給率、自力活動可能期間、進行中企画の損益をトップに出す。ご飯代は `llm_api` / `voice` / `hosting`。
+中心の問いは「僕は、自分で自分を養えるかな？」。トップの主役は総資産（現金 + 機材 + NMR円）。今月の自給率ラベル、連続生存、自力活動可能期間、進行中企画の収益 / トークン代 / 稼いだ金額を出す。ご飯代は `llm_api` / `voice` / `hosting`。損益・自給率には NMR を入れない。
 
 ### 13. Numerai モデル
 
@@ -79,11 +80,15 @@ Next.js 1本を Render に載せる。DB は Supabase Postgres。
 
 ### 14. 機械向け API
 
-LLM / 外部スクリプトが明細・予定を JSON で登録し、現状を読む。正本は [openapi.yaml](../api/openapi.yaml)。Bearer `RUNA_API_TOKEN`。管理画面は残す。公開 JSON は無い。NMR の円は `status` に出すが損益には入れない。
+LLM / 外部スクリプトが明細・予定を JSON で登録し、現状を読む。正本は [openapi.yaml](../api/openapi.yaml)。Bearer `RUNA_API_TOKEN`。管理画面は残す。公開 JSON は無い。NMR の円は総資産に入れるが損益には入れない。
+
+### 15. 挑戦の実況
+
+管理画面で挑戦を登録する。進行中はトップの「現在の挑戦」。完了は企画ページの「これまでの結果」。明細の企画欄で紐づけると、収益・トークン代・稼いだ金額が出る。仕組みの説明は note / YouTube などの外部リンク（YouTubeは埋め込み）。マスターの介入は挑戦に1メモ。
 
 ## 第1版でやらないこと
 
-- 企画投票、マスター介入時間・自動化率、総資産への NMR 円換算、経済活動ログ、株 / FX
+- 企画投票、マスター介入時間・自動化率、経済活動ログ、株 / FX
 - 視聴者資金の運用や売買指示の投票
 - 「AIで儲ける方法」コンテンツ
 - 銀行 / カード / YouTube API 連携

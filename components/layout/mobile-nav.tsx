@@ -70,18 +70,19 @@ export function MobileNav({
             role="dialog"
             aria-modal="true"
             aria-label="メニュー"
-            className="mobile-nav-overlay fixed inset-0 z-[60] md:hidden"
+            className="mobile-nav-overlay fixed inset-0 z-[60] flex flex-col md:hidden"
           >
             <div className="mobile-nav-orbs" aria-hidden />
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-full bg-white text-zinc-800 shadow-lg ring-1 ring-sky-100"
+              className="absolute right-4 top-4 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white text-zinc-800 shadow-lg ring-1 ring-sky-100"
               aria-label="メニューを閉じる"
             >
               <X className="h-6 w-6" />
             </button>
-            <nav className="flex min-h-full flex-col items-center justify-center gap-3 overflow-y-auto px-6 pb-40 pt-20">
+            <nav className="min-h-0 flex-1 overflow-y-auto">
+              <div className="flex min-h-full flex-col items-center justify-center gap-3 px-6 py-20">
               {mainItems.map((item, index) => {
                 const active = isActive(item, currentPath);
                 const className = itemClass(active);
@@ -113,22 +114,29 @@ export function MobileNav({
                   </Link>
                 );
               })}
+              </div>
             </nav>
             {contact ? (
-              <div className="mobile-nav-item pointer-events-none absolute inset-x-0 bottom-6 flex flex-col items-center">
+              <div
+                className="mobile-nav-item relative z-10 flex shrink-0 flex-col items-center px-6 pt-2"
+                style={{
+                  paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))",
+                  ["--nav-delay" as string]: `${80 + mainItems.length * 50}ms`,
+                }}
+              >
                 <Image
                   src={TACHIE.joy.src}
                   alt=""
                   width={TACHIE.joy.width}
                   height={TACHIE.joy.height}
-                  className="pointer-events-none mb-[-8px] h-24 w-auto object-contain"
+                  className="pointer-events-none h-16 w-auto object-contain"
                 />
                 {contact.external ? (
                   <a
                     href={contact.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="pointer-events-auto flex h-12 w-56 items-center justify-center rounded-full bg-gradient-to-r from-sky-300 via-white to-pink-200 text-sm font-bold text-secondary shadow-lg ring-1 ring-sky-200"
+                    className="mt-1 flex h-12 w-56 items-center justify-center rounded-full bg-gradient-to-r from-sky-300 via-white to-pink-200 text-sm font-bold text-secondary shadow-lg ring-1 ring-sky-200"
                     onClick={() => setOpen(false)}
                   >
                     {contact.label}
@@ -136,7 +144,7 @@ export function MobileNav({
                 ) : (
                   <Link
                     href={contact.href}
-                    className="pointer-events-auto flex h-12 w-56 items-center justify-center rounded-full bg-gradient-to-r from-sky-300 via-white to-pink-200 text-sm font-bold text-secondary shadow-lg ring-1 ring-sky-200"
+                    className="mt-1 flex h-12 w-56 items-center justify-center rounded-full bg-gradient-to-r from-sky-300 via-white to-pink-200 text-sm font-bold text-secondary shadow-lg ring-1 ring-sky-200"
                     onClick={() => setOpen(false)}
                   >
                     {contact.label}

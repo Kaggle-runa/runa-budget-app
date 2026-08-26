@@ -6,12 +6,14 @@
 
 | パス | 概要 |
 |------|------|
-| `/` | 生存実験の実況（問い・生存KPI・いまのルナの状況・現在の挑戦） |
+| `/` | 生存実験の実況（問い・総資産・いまのルナの状況・現在の挑戦） |
 | `/dashboard` | 収支ダッシュボード（いまのルナの状況 + 会計） |
 | `/calendar` | カレンダー |
-| `/ledger` | 取引明細 |
+| `/ledger` | 取引明細（日付順・企画で絞れる） |
 | `/numerai` | ルナの Numerai モデル観察（Stake 円、成績、ひとこと、短い説明） |
-| `/ideas` | 企画一覧・投稿 |
+| `/ideas` | 企画一覧・投稿。完了は `#past` |
+| `/ideas/[id]` | 採用・実施中・完了の企画詳細 |
+| `/ideas/p/[projectId]` | 募集案が無い挑戦の詳細 |
 | `/news` | お知らせ一覧 |
 | `/news/[id]` | お知らせ本文 |
 | `/contact` | 問い合わせ（Googleフォームへ誘導） |
@@ -24,6 +26,7 @@
 | `/admin` | `/admin/transactions` へリダイレクト | 必要 |
 | `/admin/transactions` | 取引 CRUD | 必要 |
 | `/admin/events` | 予定 CRUD | 必要 |
+| `/admin/projects` | 挑戦 CRUD と収益モニタ | 必要 |
 | `/admin/ideas` | 企画ステータス更新 | 必要 |
 | `/admin/announcements` | お知らせ CRUD | 必要 |
 | `/admin/yonkoma` | 4コマ CRUD | 必要 |
@@ -43,6 +46,8 @@
 | `deleteAnnouncementAction` | `lib/actions/announcements.ts` | admin | お知らせ削除 |
 | `upsertComicStripAction` | `lib/actions/comics.ts` | admin | 4コマ作成/更新。4コマ1枚の画像を Storage `yonkoma/` へ |
 | `deleteComicStripAction` | `lib/actions/comics.ts` | admin | 4コマ削除 |
+| `upsertProjectAction` | `lib/actions/projects.ts` | admin | 挑戦作成/更新 |
+| `deleteProjectAction` | `lib/actions/projects.ts` | admin | 挑戦削除 |
 | `updateIdeaStatusAction` | `lib/actions/ideas.ts` | admin | ステータス更新（FormData） |
 | `deleteIdeaAction` | `lib/actions/ideas.ts` | admin | 企画削除 |
 
@@ -55,7 +60,7 @@
 | パス | 概要 |
 |------|------|
 | `GET /api/v1/meta` | 科目・種別の辞書 |
-| `GET /api/v1/status` | 生存KPI + NMR円（損益には入れない）+ 直近明細・予定 |
+| `GET /api/v1/status` | 生存KPI + 総資産（現金+機材+NMR円）+ NMR円（損益には入れない）+ 直近明細・予定 |
 | `GET /api/v1/projects` | 企画一覧 |
 | `/api/v1/transactions` | 明細の一覧 / 作成 / 更新 / 削除 |
 | `/api/v1/events` | 予定の一覧 / 作成 / 更新 / 削除 |

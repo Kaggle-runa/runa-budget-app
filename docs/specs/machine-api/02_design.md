@@ -58,3 +58,4 @@ lib/events.ts
 ## NMR
 
 `status.nmr` に円換算と前日比。`includedInProfit` は常に false。自給率の式は変えない。
+`status.assets` は `現金 + 機材 + NMR円`。損益には入れない。

@@ -18,17 +18,22 @@ import {
   getLatestUpdatedAt,
   listAnnouncements,
   listComicStrips,
+  listIdeas,
   listProjects,
   listTransactions,
 } from "@/lib/queries";
-import { summarizeChallenges, summarizeSurvival } from "@/lib/survival";
+import {
+  attachChallengeIdeas,
+  summarizeChallenges,
+  summarizeSurvival,
+} from "@/lib/survival";
 
 function delay(ms: number) {
   return { ["--reveal-delay" as string]: `${ms}ms` };
 }
 
 export default async function HomePage() {
-  const [transactions, projects, latest, news, comics, numerai, nmr] =
+  const [transactions, projects, latest, news, comics, numerai, nmr, ideas] =
     await Promise.all([
       listTransactions(),
       listProjects(),
@@ -37,9 +42,13 @@ export default async function HomePage() {
       listComicStrips({ publishedOnly: true }),
       getNumeraiSnapshot(),
       getNmrQuote(),
+      listIdeas(),
     ]);
   const survival = summarizeSurvival(transactions);
-  const challenges = summarizeChallenges(transactions, projects);
+  const challenges = attachChallengeIdeas(
+    summarizeChallenges(transactions, projects),
+    ideas
+  );
   const todayFeed = buildTodayRunaFeed(transactions, numerai, nmr);
 
   return (
@@ -78,16 +87,12 @@ export default async function HomePage() {
             <p
               data-reveal
               style={delay(360)}
-              className="mt-3 max-w-xl whitespace-pre-line text-sm text-zinc-500"
+              className="mt-3 max-w-xl text-xs leading-relaxed text-zinc-500"
             >
-              {SITE.description}
-            </p>
-            <p
-              data-reveal
-              style={delay(400)}
-              className="mt-2 font-display text-sm text-sky-700"
-            >
-              {SITE.catchphrase}
+              ※ {SITE.masterAside}{" "}
+              <a href="#master" className="underline decoration-zinc-300 underline-offset-2 hover:text-secondary">
+                くわしく見る
+              </a>
             </p>
             <div
               data-reveal
@@ -95,10 +100,10 @@ export default async function HomePage() {
               className="mt-6 flex flex-wrap gap-3"
             >
               <Button asChild size="lg">
-                <Link href="/dashboard">収支を見る</Link>
+                <Link href="/dashboard">今日のルナを見る</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link href="/ideas">企画を送る</Link>
+                <Link href="/ideas">次の仕事を提案する</Link>
               </Button>
             </div>
           </div>
@@ -110,10 +115,11 @@ export default async function HomePage() {
 
       <SurvivalStatusBoard
         survival={survival}
+        nmrYen={todayFeed.nmr.yenNow}
         asOf={formatAsOf(latest ?? new Date())}
       />
 
-      <section className="mt-10" data-reveal>
+      <section id="today-runa" className="mt-10 scroll-mt-24" data-reveal>
         <GlassCard className="p-6">
           <h2 className="text-xl font-bold text-secondary">いまのルナの状況</h2>
           <div className="mt-4">
@@ -122,26 +128,41 @@ export default async function HomePage() {
         </GlassCard>
       </section>
 
-      <section className="mt-10 grid gap-4 lg:grid-cols-2">
-        <div data-reveal>
-          <SurvivalChallengeCard challenges={challenges} />
-        </div>
-        <div data-reveal style={delay(90)}>
-          <GlassCard className="h-full p-5">
-            <h2 className="text-lg font-semibold text-secondary">マスター</h2>
-            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-600">
-              {SITE.masterNote}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button asChild variant="outline" size="sm">
-                <Link href="/ledger">取引明細を見る</Link>
-              </Button>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/calendar">カレンダーへ</Link>
-              </Button>
+      <section className="mt-10" data-reveal>
+        <SurvivalChallengeCard challenges={challenges} />
+      </section>
+
+      <section className="mt-10" data-reveal>
+        <GlassCard className="p-5">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-secondary">Numerai</h2>
+              <p className="mt-2 text-sm text-zinc-600">
+                AIの僕が、AIモデルも育ててるよ。Stakeの円と成績はこっちだよ。
+              </p>
             </div>
-          </GlassCard>
-        </div>
+            <Button asChild variant="outline">
+              <Link href="/numerai">観察ページへ</Link>
+            </Button>
+          </div>
+        </GlassCard>
+      </section>
+
+      <section id="master" className="mt-10 scroll-mt-24" data-reveal>
+        <GlassCard className="p-5">
+          <h2 className="text-lg font-semibold text-secondary">マスター</h2>
+          <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-600">
+            {SITE.masterNote}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/ledger">取引明細を見る</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/calendar">カレンダーへ</Link>
+            </Button>
+          </div>
+        </GlassCard>
       </section>
 
       {news.length > 0 ? (

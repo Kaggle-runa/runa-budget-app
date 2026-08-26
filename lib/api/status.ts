@@ -7,7 +7,12 @@ import {
   listProjects,
   listTransactions,
 } from "@/lib/queries";
-import { summarizeChallenges, summarizeSurvival, todayInJapan } from "@/lib/survival";
+import {
+  summarizeChallenges,
+  summarizeSurvival,
+  todayInJapan,
+  totalAssetsYen,
+} from "@/lib/survival";
 
 export async function buildApiStatus() {
   const [transactions, events, projects, latest, numerai, quote] = await Promise.all([
@@ -50,12 +55,19 @@ export async function buildApiStatus() {
       runwayDays: survival.runwayDays,
       streakDays: survival.streakDays,
     },
+    assets: {
+      total: totalAssetsYen(survival.cash, survival.equipment, yenNow),
+      cash: survival.cash,
+      equipment: survival.equipment,
+      nmrYen: yenNow,
+      note: "総資産 = 現金 + 機材 + NMR円。損益・自給率にはNMRを入れない。",
+    },
     nmr: {
       yenNow,
       yenDelta,
       change24h: quote.change24h,
       includedInProfit: false,
-      note: "NMRの円は評価額。損益・自給率・所持金（現金）には入れない。",
+      note: "NMRの円は評価額。総資産には入れる。損益・自給率・現金には入れない。",
     },
     challenges,
     recentTransactions: transactions.slice(0, 10),

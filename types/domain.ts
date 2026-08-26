@@ -40,10 +40,19 @@ export type IdeaDTO = {
   createdAt: string;
 };
 
+export type ProjectLink = {
+  kind: "youtube" | "note" | "other";
+  label: string;
+  url: string;
+};
+
 export type ProjectDTO = {
   id: string;
   title: string;
   status: ProjectStatus | string;
+  masterNote: string | null;
+  overview: string | null;
+  links: ProjectLink[];
 };
 
 export type MonthlyPoint = {
@@ -68,8 +77,11 @@ export type KpiSummary = {
   asOf: string;
 };
 
+export type MonthSurvivalTone = "ok" | "short" | "unknown";
+
 export type SurvivalSummary = {
   cash: number;
+  equipment: number;
   todayDelta: number;
   monthIncome: number;
   monthMealCost: number;
@@ -85,9 +97,17 @@ export type SurvivalSummary = {
 export type ChallengePl = {
   projectId: string;
   title: string;
+  status: ProjectStatus | string;
   income: number;
+  tokenCost: number;
+  otherExpense: number;
   expense: number;
+  earned: number;
   pl: number;
+  masterNote: string | null;
+  overview: string | null;
+  ideaId: string | null;
+  links: ProjectLink[];
 };
 
 export type NumeraiModelSnapshot = {

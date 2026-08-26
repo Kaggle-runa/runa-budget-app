@@ -70,6 +70,9 @@ erDiagram
 |----|----|------|-----|
 | title | text | yes | 企画名 |
 | status | text | yes | `planned` / `active` / `completed`（既定 `planned`） |
+| overview | text | no | 企画の概要。詳細ページでは結果・明細カードの下の別カードに出す |
+| masterNote | text | no | マスターが介入した内容。公開する |
+| links | json | no | 外部リンクの配列 `{ kind: youtube/note/other, label, url }`。仕組みの説明はここに貼る |
 
 ## Transaction
 

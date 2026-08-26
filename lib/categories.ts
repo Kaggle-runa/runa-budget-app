@@ -111,3 +111,7 @@ export function eventKindLabel(key: string): string {
 export function ideaStatusLabel(key: string): string {
   return IDEA_STATUSES[key as IdeaStatus] ?? key;
 }
+
+export function projectStatusLabel(key: string): string {
+  return PROJECT_STATUSES[key as ProjectStatus] ?? key;
+}

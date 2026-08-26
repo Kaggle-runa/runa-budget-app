@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 const ITEMS = [
   { href: "/admin/transactions", label: "取引" },
   { href: "/admin/events", label: "予定" },
+  { href: "/admin/projects", label: "挑戦" },
   { href: "/admin/ideas", label: "企画" },
   { href: "/admin/announcements", label: "お知らせ" },
   { href: "/admin/yonkoma", label: "4コマ" },

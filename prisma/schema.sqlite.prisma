@@ -12,6 +12,9 @@ model Project {
   id           String        @id @default(cuid())
   title        String
   status       String        @default("planned")
+  masterNote   String?
+  overview     String?
+  links        Json?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   transactions Transaction[]

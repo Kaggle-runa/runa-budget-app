@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { GlassCard } from "@/components/layout/glass-card";
 import { Button } from "@/components/ui/button";
-import { formatSignedYen, formatYen } from "@/lib/format";
+import { formatYen } from "@/lib/format";
+import {
+  monthSurvivalStatus,
+  totalAssetsYen,
+} from "@/lib/survival";
 import { cn } from "@/lib/utils";
 import type { SurvivalSummary } from "@/types/domain";
 
@@ -9,65 +13,79 @@ function delay(ms: number) {
   return { ["--reveal-delay" as string]: `${ms}ms` };
 }
 
+function Breakdown({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div>
+      <dt className="text-xs text-sky-700/80">{label}</dt>
+      <dd className="mt-1 text-base font-semibold tabular-nums text-zinc-800">
+        {value}
+      </dd>
+    </div>
+  );
+}
+
 export function SurvivalStatusBoard({
   survival,
+  nmrYen,
   asOf,
 }: {
   survival: SurvivalSummary;
+  nmrYen: number | null;
   asOf: string;
 }) {
   const rate = survival.selfSufficiencyPercent;
-  const statusText = survival.surviving
-    ? rate === null
-      ? "ご飯代の記録はまだ少ないけど、いまは動けてるよ"
-      : survival.streakDays > 0
-        ? `所持金が尽きずに、${survival.streakDays}日間生存できてるよ！`
-        : "今月のご飯代は、自分の売上でまかなえてるよ"
-    : rate !== null && rate < 100
-      ? `このままだとマスターに養われちゃうよ。ご飯代まであと${formatYen(Math.max(0, survival.monthMealCost - survival.monthIncome))}だね`
-      : "所持金が追いついてないよ。ちょっとピンチだね";
+  const month = monthSurvivalStatus(rate);
+  const total = totalAssetsYen(survival.cash, survival.equipment, nmrYen);
 
   return (
-    <section className="mt-10 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+    <section className="mt-8 space-y-4">
       <div data-reveal>
-        <GlassCard className="h-full p-6">
-          <p className="text-sm text-sky-700/80">所持金</p>
-          <p
-            className={cn(
-              "mt-2 text-4xl font-semibold tabular-nums animate-pop-in sm:text-5xl",
-              survival.cash >= 0 ? "text-accent" : "text-rose-600"
-            )}
-          >
-            {formatYen(survival.cash)}
+        <GlassCard className="p-6">
+          <p className="text-sm text-sky-700/80">現在の総資産</p>
+          <p className="mt-2 text-4xl font-semibold tabular-nums text-accent animate-pop-in sm:text-5xl">
+            {formatYen(total)}
           </p>
+          <dl className="mt-4 grid gap-3 sm:grid-cols-3">
+            <Breakdown label="現金" value={formatYen(survival.cash)} />
+            <Breakdown
+              label="NMR"
+              value={nmrYen === null ? "—" : formatYen(nmrYen)}
+            />
+            <Breakdown label="機材" value={formatYen(survival.equipment)} />
+          </dl>
           <p
             className={cn(
-              "mt-2 text-sm tabular-nums",
-              survival.todayDelta > 0
-                ? "text-accent"
-                : survival.todayDelta < 0
-                  ? "text-rose-600"
-                  : "text-muted-foreground"
+              "mt-5 inline-flex items-center rounded-full px-3 py-1 text-sm",
+              month.tone === "ok" && "bg-emerald-50 text-emerald-800",
+              month.tone === "short" && "bg-rose-50 text-rose-800",
+              month.tone === "unknown" && "bg-zinc-100 text-zinc-700"
             )}
           >
-            今日 {formatSignedYen(survival.todayDelta)}
+            {month.tone === "ok" ? "🟢 " : month.tone === "short" ? "🔴 " : ""}
+            {month.label}
           </p>
-          <p
-            className={cn(
-              "mt-4 inline-block rounded-full px-3 py-1 text-sm",
-              survival.surviving
-                ? "bg-emerald-50 text-emerald-800"
-                : "bg-rose-50 text-rose-800"
-            )}
-          >
-            {statusText}
+          <p className="mt-3 text-sm text-zinc-700">
+            連続生存{" "}
+            <span className="font-semibold tabular-nums">
+              {survival.streakDays > 0 ? `${survival.streakDays}日` : "—"}
+            </span>
+            <span className="ml-2 text-xs text-muted-foreground">
+              所持金が尽きてない日数だよ
+            </span>
           </p>
           <p className="mt-3 text-xs text-muted-foreground">{asOf}</p>
         </GlassCard>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+
+      <div className="grid gap-4 sm:grid-cols-2">
         <div data-reveal style={delay(80)}>
-          <GlassCard className="p-5">
+          <GlassCard className="h-full p-5">
             <p className="text-sm text-sky-700/80">今月の自給率</p>
             {rate === null ? (
               <>
@@ -86,7 +104,7 @@ export function SurvivalStatusBoard({
                     rate >= 100 ? "text-emerald-700" : "text-rose-700"
                   )}
                 >
-                  {rate >= 100 ? "🟢" : "🔴"} 自給率 {rate}%
+                  {rate}%
                 </p>
                 <p
                   className={cn(
@@ -107,50 +125,20 @@ export function SurvivalStatusBoard({
           </GlassCard>
         </div>
         <div data-reveal style={delay(140)}>
-          <GlassCard className="p-5">
+          <GlassCard className="h-full p-5">
             <p className="text-sm text-sky-700/80">自力活動可能期間</p>
             <p className="mt-2 text-3xl font-semibold tabular-nums text-secondary">
               {survival.runwayDays === null ? "—" : `${survival.runwayDays}日`}
             </p>
             <p className="mt-2 text-xs text-muted-foreground">
-              直近30日のご飯代から見ると、いまの所持金であと何日動けるかの目安だよ
+              直近30日のご飯代から見ると、いまの現金であと何日動けるかの目安だよ
             </p>
           </GlassCard>
         </div>
       </div>
-      <div className="grid gap-4 sm:grid-cols-3 lg:col-span-2">
-        <div data-reveal style={delay(40)}>
-          <GlassCard className="p-4">
-            <p className="text-xs text-sky-700/80">累計売上</p>
-            <p className="mt-1 text-xl font-semibold tabular-nums">
-              {formatYen(survival.lifetimeIncome)}
-            </p>
-          </GlassCard>
-        </div>
-        <div data-reveal style={delay(90)}>
-          <GlassCard className="p-4">
-            <p className="text-xs text-sky-700/80">累計ご飯代</p>
-            <p className="mt-1 text-xl font-semibold tabular-nums text-rose-700">
-              {formatYen(survival.lifetimeMealCost)}
-            </p>
-          </GlassCard>
-        </div>
-        <div data-reveal style={delay(140)}>
-          <GlassCard className="p-4">
-            <p className="text-xs text-sky-700/80">売上 − ご飯代</p>
-            <p
-              className={cn(
-                "mt-1 text-xl font-semibold tabular-nums",
-                survival.lifetimeNet >= 0 ? "text-accent" : "text-rose-600"
-              )}
-            >
-              {formatSignedYen(survival.lifetimeNet)}
-            </p>
-          </GlassCard>
-        </div>
-      </div>
-      <p className="text-xs text-muted-foreground lg:col-span-2">
-        数字の元は取引明細だよ。借入や値動きの含み損益は、まだここに入れてないんだ。
+
+      <p className="text-xs text-muted-foreground">
+        総資産は現金 + 機材 + NMRの円だよ。損益や自給率にはNMRを入れないんだ。株やFXはまだ入れてないよ。
         <Button asChild variant="link" className="h-auto px-1 py-0 text-xs">
           <Link href="/ledger">明細を見る</Link>
         </Button>

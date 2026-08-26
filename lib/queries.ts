@@ -2,6 +2,7 @@ import { endOfMonth, startOfMonth } from "date-fns";
 import { prisma } from "@/lib/db";
 import { toTransactionDTO } from "@/lib/finance";
 import { ANNOUNCEMENT_CATEGORIES } from "@/lib/categories";
+import { parseProjectLinks } from "@/lib/project-links";
 import type {
   AnnouncementDTO,
   ComicStripDTO,
@@ -129,6 +130,44 @@ export async function listMonthBundle(year: number, month: number) {
   return { start, end, transactions, events };
 }
 
+export async function getIdea(id: string): Promise<IdeaDTO | null> {
+  const row = await prisma.idea.findUnique({ where: { id } });
+  if (!row) return null;
+  return {
+    id: row.id,
+    displayName: row.displayName,
+    title: row.title,
+    body: row.body,
+    status: row.status,
+    projectId: row.projectId,
+    createdAt: row.createdAt.toISOString(),
+  };
+}
+
+function toProjectDTO(row: {
+  id: string;
+  title: string;
+  status: string;
+  masterNote: string | null;
+  overview: string | null;
+  links: unknown;
+}): ProjectDTO {
+  return {
+    id: row.id,
+    title: row.title,
+    status: row.status,
+    masterNote: row.masterNote ?? null,
+    overview: row.overview ?? null,
+    links: parseProjectLinks(row.links),
+  };
+}
+
+export async function getProject(id: string): Promise<ProjectDTO | null> {
+  const row = await prisma.project.findUnique({ where: { id } });
+  if (!row) return null;
+  return toProjectDTO(row);
+}
+
 export async function listIdeas(): Promise<IdeaDTO[]> {
   const rows = await prisma.idea.findMany({
     orderBy: { createdAt: "desc" },
@@ -198,11 +237,7 @@ export async function listProjects(): Promise<ProjectDTO[]> {
   const rows = await prisma.project.findMany({
     orderBy: { createdAt: "desc" },
   });
-  return rows.map((row) => ({
-    id: row.id,
-    title: row.title,
-    status: row.status,
-  }));
+  return rows.map(toProjectDTO);
 }
 
 function toComicStripDTO(row: {
@@ -232,12 +267,13 @@ export async function listComicStrips(options?: {
 }
 
 export async function getLatestUpdatedAt(): Promise<Date | null> {
-  const [tx, event, idea, announcement, comic] = await Promise.all([
+  const [tx, event, idea, announcement, comic, project] = await Promise.all([
     prisma.transaction.findFirst({ orderBy: { updatedAt: "desc" } }),
     prisma.event.findFirst({ orderBy: { updatedAt: "desc" } }),
     prisma.idea.findFirst({ orderBy: { updatedAt: "desc" } }),
     prisma.announcement.findFirst({ orderBy: { updatedAt: "desc" } }),
     prisma.comicStrip.findFirst({ orderBy: { updatedAt: "desc" } }),
+    prisma.project.findFirst({ orderBy: { updatedAt: "desc" } }),
   ]);
   const dates = [
     tx?.updatedAt,
@@ -245,6 +281,7 @@ export async function getLatestUpdatedAt(): Promise<Date | null> {
     idea?.updatedAt,
     announcement?.updatedAt,
     comic?.updatedAt,
+    project?.updatedAt,
   ].filter(
     (value): value is Date => Boolean(value)
   );

@@ -67,6 +67,7 @@ export async function submitIdeaAction(
 const statusSchema = z.object({
   id: z.string().min(1),
   status: z.enum(["submitted", "reviewing", "adopted", "in_progress", "done"]),
+  projectId: z.string().optional().or(z.literal("")),
 });
 
 export async function updateIdeaStatusAction(formData: FormData): Promise<void> {
@@ -74,6 +75,7 @@ export async function updateIdeaStatusAction(formData: FormData): Promise<void> 
   const parsed = statusSchema.safeParse({
     id: formData.get("id"),
     status: formData.get("status"),
+    projectId: formData.get("projectId") ?? "",
   });
   if (!parsed.success) {
     throw new Error("ステータスが不正です");
@@ -84,7 +86,10 @@ export async function updateIdeaStatusAction(formData: FormData): Promise<void> 
 
   await prisma.idea.update({
     where: { id: parsed.data.id },
-    data: { status: parsed.data.status },
+    data: {
+      status: parsed.data.status,
+      projectId: parsed.data.projectId || null,
+    },
   });
   revalidatePublic();
 }

@@ -17,13 +17,69 @@ async function main() {
   await prisma.project.deleteMany();
 
   const wallpaper = await prisma.project.create({
-    data: { title: "AI壁紙販売", status: "completed" },
+    data: {
+      title: "AI壁紙販売",
+      status: "completed",
+      overview:
+        "AIで夜空や街の壁紙を作って、Boothでセット販売してるよ。印刷はしてない、データの販売だね。",
+      links: [
+        {
+          kind: "youtube",
+          label: "壁紙づくりの配信（サンプル）",
+          url: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+        },
+        {
+          kind: "note",
+          label: "作り方メモ（サンプル）",
+          url: "https://note.com/hanakuri_runa",
+        },
+      ],
+    },
   });
   const fortune = await prisma.project.create({
-    data: { title: "AI占いnote", status: "completed" },
+    data: {
+      title: "AI占いnote",
+      status: "completed",
+      overview:
+        "星座別の金運記事を note の有料マガジンで出してるよ。当たる保証は無いけど、収支はここに残すね。",
+      links: [
+        {
+          kind: "youtube",
+          label: "占い記事の作業配信（サンプル）",
+          url: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+        },
+        {
+          kind: "note",
+          label: "占い記事の裏話（サンプル）",
+          url: "https://note.com/hanakuri_runa",
+        },
+      ],
+    },
   });
   const clip = await prisma.project.create({
-    data: { title: "切り抜き量産", status: "active" },
+    data: {
+      title: "切り抜き量産",
+      status: "active",
+      overview:
+        "配信の切り抜きを自分でAI編集して、再生分配を稼いでるよ。外注せずに回せるかを見てるね。",
+      links: [
+        {
+          kind: "youtube",
+          label: "切り抜きの作業風景（サンプル）",
+          url: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+        },
+        {
+          kind: "note",
+          label: "noteの作業ログ（サンプル）",
+          url: "https://note.com/hanakuri_runa",
+        },
+        {
+          kind: "other",
+          label: "GitHub（サンプル）",
+          url: "https://github.com/Kaggle-runa/runa-budget-app",
+        },
+      ],
+    },
   });
   const race = await prisma.project.create({
     data: { title: "AI競馬予想（実験）", status: "planned" },
