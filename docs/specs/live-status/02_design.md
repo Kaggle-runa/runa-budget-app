@@ -50,6 +50,7 @@ components/numerai/
 ## 更新経路
 
 読み取りのみ。Numerai GraphQL と価格は `getNumeraiSnapshot` / `getNmrQuote`（1時間キャッシュ、tag `numerai`）。
+24h 変化は CoinGecko → CoinPaprika → Binance。Render の IP では CoinGecko が 429 になりやすい。
 管理の `/admin/numerai` から `refreshNumeraiAction` で tag を破棄して取り直し、`/` / `/dashboard` / `/numerai` を再検証する。
 
 ## 第1版でやらない

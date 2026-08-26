@@ -127,7 +127,7 @@ NMR の値動き・未確定の payout は損益に入れない。総資産の�
 
 `円 = (stakeValue の合計 + availableNmr) × NMR/USD × ドル円`
 
-NMR/USD は Numerai の `latestNmrPrice`、だめなら CoinGecko。24h 変化は CoinGecko。ドル円は open.er-api.com、だめなら Frankfurter。
+NMR/USD は Numerai の `latestNmrPrice`、だめなら CoinGecko。24h 変化は CoinGecko、だめなら CoinPaprika / Binance。ドル円は open.er-api.com、だめなら Frankfurter。
 帳簿の損益には入れない。提出用の秘密情報は置かない。
 
 ## 確認したいこと

@@ -256,7 +256,10 @@ async function loadGeckoNmr(): Promise<GeckoNmr> {
   try {
     const response = await fetch(
       "https://api.coingecko.com/api/v3/simple/price?ids=numeraire&vs_currencies=usd,jpy&include_24hr_change=true",
-      FETCH_CACHE
+      {
+        ...FETCH_CACHE,
+        headers: { Accept: "application/json" },
+      }
     );
     if (!response.ok) return empty;
     const json = (await response.json()) as {
@@ -307,6 +310,42 @@ async function loadUsdJpy(): Promise<number | null> {
   return null;
 }
 
+async function loadChange24h(geckoChange: number | null): Promise<number | null> {
+  if (geckoChange !== null) return geckoChange;
+
+  try {
+    const response = await fetch(
+      "https://api.coinpaprika.com/v1/tickers/nmr-numeraire",
+      FETCH_CACHE
+    );
+    if (response.ok) {
+      const json = (await response.json()) as {
+        quotes?: { USD?: { percent_change_24h?: number } };
+      };
+      const value = finiteNumber(json.quotes?.USD?.percent_change_24h);
+      if (value !== null) return value;
+    }
+  } catch {
+    // 次へ
+  }
+
+  try {
+    const response = await fetch(
+      "https://api.binance.com/api/v3/ticker/24hr?symbol=NMRUSDT",
+      FETCH_CACHE
+    );
+    if (response.ok) {
+      const json = (await response.json()) as { priceChangePercent?: string };
+      const value = toNumber(json.priceChangePercent);
+      if (value !== null) return value;
+    }
+  } catch {
+    // 取れなければ null
+  }
+
+  return null;
+}
+
 async function loadNmrQuote(): Promise<NmrQuote> {
   const [gecko, numeraiUsd, usdJpyDirect] = await Promise.all([
     loadGeckoNmr(),
@@ -318,14 +357,15 @@ async function loadNmrQuote(): Promise<NmrQuote> {
     gecko.usdPrice !== null && gecko.usdPrice > 0 && gecko.jpyPrice !== null
       ? gecko.jpyPrice / gecko.usdPrice
       : null;
+  const change24h = await loadChange24h(gecko.change24h);
   return {
     usdPrice,
-    change24h: gecko.change24h,
+    change24h,
     usdJpy: usdJpyDirect ?? implied,
   };
 }
 
-export const getNmrQuote = unstable_cache(loadNmrQuote, ["nmr-quote-fx-v2"], {
+export const getNmrQuote = unstable_cache(loadNmrQuote, ["nmr-quote-fx-v3"], {
   revalidate: 3600,
   tags: [NUMERAI_CACHE_TAG],
 });
