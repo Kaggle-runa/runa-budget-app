@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 export function revalidatePublic(): void {
   revalidatePath("/");
   revalidatePath("/dashboard");
+  revalidatePath("/numerai");
   revalidatePath("/calendar");
   revalidatePath("/ledger");
   revalidatePath("/ideas");
@@ -16,4 +17,5 @@ export function revalidatePublic(): void {
   revalidatePath("/admin/projects");
   revalidatePath("/admin/announcements");
   revalidatePath("/admin/yonkoma");
+  revalidatePath("/admin/numerai");
 }

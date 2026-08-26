@@ -49,7 +49,8 @@ components/numerai/
 
 ## 更新経路
 
-読み取りのみ。Numerai GraphQL と価格は `getNumeraiSnapshot` / `getNmrQuote`（1時間キャッシュ）。
+読み取りのみ。Numerai GraphQL と価格は `getNumeraiSnapshot` / `getNmrQuote`（1時間キャッシュ、tag `numerai`）。
+管理の `/admin/numerai` から `refreshNumeraiAction` で tag を破棄して取り直し、`/` / `/dashboard` / `/numerai` を再検証する。
 
 ## 第1版でやらない
 

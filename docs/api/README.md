@@ -30,6 +30,7 @@
 | `/admin/ideas` | 企画ステータス更新 | 必要 |
 | `/admin/announcements` | お知らせ CRUD | 必要 |
 | `/admin/yonkoma` | 4コマ CRUD | 必要 |
+| `/admin/numerai` | Numerai / NMR円の手動取得 | 必要 |
 
 ## Server Action
 
@@ -48,6 +49,7 @@
 | `deleteComicStripAction` | `lib/actions/comics.ts` | admin | 4コマ削除 |
 | `upsertProjectAction` | `lib/actions/projects.ts` | admin | 挑戦作成/更新 |
 | `deleteProjectAction` | `lib/actions/projects.ts` | admin | 挑戦削除 |
+| `refreshNumeraiAction` | `lib/actions/numerai.ts` | admin | Numeraiキャッシュ破棄と再取得 |
 | `updateIdeaStatusAction` | `lib/actions/ideas.ts` | admin | ステータス更新（FormData） |
 | `deleteIdeaAction` | `lib/actions/ideas.ts` | admin | 企画削除 |
 

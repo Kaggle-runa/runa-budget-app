@@ -10,6 +10,7 @@ const ITEMS = [
   { href: "/admin/ideas", label: "企画" },
   { href: "/admin/announcements", label: "お知らせ" },
   { href: "/admin/yonkoma", label: "4コマ" },
+  { href: "/admin/numerai", label: "Numerai" },
 ];
 
 export function AdminNav({ currentPath }: { currentPath: string }) {

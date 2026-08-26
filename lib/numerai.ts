@@ -10,6 +10,10 @@ import type {
 
 const NUMERAI_API = "https://api-tournament.numer.ai/";
 
+export const NUMERAI_CACHE_TAG = "numerai";
+
+const FETCH_CACHE = { next: { revalidate: 3600, tags: [NUMERAI_CACHE_TAG] } };
+
 const PROFILE_QUERY = `
 query($modelName: String!) {
   v3UserProfile(modelName: $modelName) {
@@ -97,7 +101,7 @@ async function numeraiGraphql<T>(
     method: "POST",
     headers,
     body: JSON.stringify({ query, variables }),
-    next: { revalidate: 3600 },
+    ...FETCH_CACHE,
   });
   if (!response.ok) {
     throw new Error(`Numerai API ${response.status}`);
@@ -168,7 +172,7 @@ async function loadNumeraiSnapshot(): Promise<NumeraiSnapshot> {
 export const getNumeraiSnapshot = unstable_cache(
   loadNumeraiSnapshot,
   ["numerai-snapshot-stake-nmr-v2"],
-  { revalidate: 3600 }
+  { revalidate: 3600, tags: [NUMERAI_CACHE_TAG] }
 );
 
 export function formatCorr(value: number | null): string {
@@ -252,7 +256,7 @@ async function loadGeckoNmr(): Promise<GeckoNmr> {
   try {
     const response = await fetch(
       "https://api.coingecko.com/api/v3/simple/price?ids=numeraire&vs_currencies=usd,jpy&include_24hr_change=true",
-      { next: { revalidate: 3600 } }
+      FETCH_CACHE
     );
     if (!response.ok) return empty;
     const json = (await response.json()) as {
@@ -291,7 +295,7 @@ async function loadUsdJpy(): Promise<number | null> {
   ];
   for (const url of sources) {
     try {
-      const response = await fetch(url, { next: { revalidate: 3600 } });
+      const response = await fetch(url, FETCH_CACHE);
       if (!response.ok) continue;
       const json = (await response.json()) as { rates?: { JPY?: number } };
       const jpy = finiteNumber(json.rates?.JPY);
@@ -323,4 +327,5 @@ async function loadNmrQuote(): Promise<NmrQuote> {
 
 export const getNmrQuote = unstable_cache(loadNmrQuote, ["nmr-quote-fx-v2"], {
   revalidate: 3600,
+  tags: [NUMERAI_CACHE_TAG],
 });

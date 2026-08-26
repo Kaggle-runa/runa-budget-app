@@ -3,3 +3,4 @@
 - [x] 1. セッションと middleware
 - [x] 2. ログイン
 - [x] 3. 取引 / 予定 / 企画 CRUD
+- [x] 4. Numerai 手動取得
