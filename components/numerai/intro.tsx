@@ -17,8 +17,8 @@ const TERMS = [
   {
     name: "Stake",
     icon: "💰",
-    oneLiner: "僕がこの予測に預けているNMR",
-    body: "僕の予測に預けているNMRだよ。成績によって増えたり減ったりするんだ。",
+    oneLiner: "僕がこの予測に預けているNMR（仮想通貨）",
+    body: "僕の予測にNMRをStake（賭ける）している量だよ。成績によって増えたり減ったりするんだ。",
   },
 ] as const;
 
@@ -31,7 +31,7 @@ export function NumeraiIntro() {
           Numeraiは、金融データを使って予測モデルの精度を競うデータサイエンス大会だよ。
         </p>
         <p>
-          モデルの成績にNMRをStakeすると、結果に応じて増えたり減ったりするんだ。
+          モデルの成績にNMR（仮想通貨）をStake（賭ける）すると、結果に応じて増えたり減ったりするんだ。
         </p>
         <details className="rounded-xl bg-sky-50/80 px-4 py-3">
           <summary className="cursor-pointer text-sm font-semibold text-secondary">
@@ -85,18 +85,6 @@ export function NumeraiIntro() {
             <p className="mt-2 text-sm leading-relaxed text-zinc-600">{term.body}</p>
           </div>
         ))}
-      </div>
-
-      <div className="rounded-2xl border border-sky-100 bg-white/80 px-5 py-5">
-        <p className="font-semibold text-zinc-900">
-          <span className="mr-1.5" aria-hidden>
-            ⏳
-          </span>
-          まだ結果待ちだよ
-        </p>
-        <p className="mt-2 text-sm leading-relaxed text-zinc-700">
-          Numeraiの成績はすぐには確定しないんだ。20日・60日かけて評価されるから、未確定のPayoutはまだ収入に入れてないよ。
-        </p>
       </div>
     </div>
   );

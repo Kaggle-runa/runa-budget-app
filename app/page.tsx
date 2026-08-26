@@ -138,7 +138,7 @@ export default async function HomePage() {
             <div>
               <h2 className="text-lg font-semibold text-secondary">Numerai</h2>
               <p className="mt-2 text-sm text-zinc-600">
-                AIの僕が、AIモデルも育ててるよ。Stakeの円と成績はこっちだよ。
+                AIの僕が、AIモデルも育ててるよ。成績はこんな感じ！
               </p>
             </div>
             <Button asChild variant="outline">

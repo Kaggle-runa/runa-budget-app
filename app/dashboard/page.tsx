@@ -9,8 +9,8 @@ import { DashCard } from "@/components/layout/dash-card";
 import { PageShell } from "@/components/layout/page-shell";
 import {
   balanceSheet,
-  cashFlowGraph,
   categorySlices,
+  dateKey,
   monthlySeriesForYear,
   summarizeKpis,
   summarizeMonth,
@@ -18,6 +18,7 @@ import {
 import { formatAsOf } from "@/lib/format";
 import { getNmrQuote, getNumeraiSnapshot } from "@/lib/numerai";
 import { getLatestUpdatedAt, listTransactions } from "@/lib/queries";
+import { todayInJapan } from "@/lib/survival";
 import { buildTodayRunaFeed } from "@/lib/today-runa";
 
 export default async function DashboardPage() {
@@ -27,11 +28,11 @@ export default async function DashboardPage() {
     getNumeraiSnapshot(),
     getNmrQuote(),
   ]);
+  const today = dateKey(todayInJapan());
   const kpi = summarizeKpis(transactions);
   const asOf = latest ? formatAsOf(latest) : kpi.asOf;
   const year = latest ? latest.getFullYear() : new Date().getFullYear();
   const month = latest ? latest.getMonth() + 1 : new Date().getMonth() + 1;
-  const graph = cashFlowGraph(transactions);
   const sheet = balanceSheet(transactions);
   const monthOps = summarizeMonth(transactions, year, month);
   const monthKey = `${year}-${String(month).padStart(2, "0")}`;
@@ -69,11 +70,11 @@ export default async function DashboardPage() {
           <DashSectionHeader
             title="貸借対照表"
             asOf={asOf}
-            description="左が資産、右が負債と純資産だよ。現金は流動資産、マスターから借りてる分は固定負債だね。"
+            description="左が資産、右が負債と純資産だよ。NMRはいまの時価で、損益には入れてないよ。"
           />
-          <BalanceSheetView sheet={sheet} />
+          <BalanceSheetView sheet={sheet} nmrYen={todayFeed.nmr.yenNow} />
         </DashCard>
-        <CashFlowCard graph={graph} asOf={asOf} />
+        <CashFlowCard transactions={transactions} today={today} asOf={asOf} />
         <DashCard shutter>
           <DashSectionHeader
             title="月ごとの収支の推移"
@@ -82,10 +83,7 @@ export default async function DashboardPage() {
           />
           <MonthlyChart data={monthlySeriesForYear(transactions, year)} />
         </DashCard>
-        <CategoryCharts
-          income={categorySlices(transactions, "income")}
-          expense={categorySlices(transactions, "expense")}
-        />
+        <CategoryCharts transactions={transactions} today={today} />
         <p className="text-center text-sm text-zinc-500">
           数字の元は取引明細だよ。僕もこれを見てご飯代を管理してるから、君も一緒に見ていってね
         </p>

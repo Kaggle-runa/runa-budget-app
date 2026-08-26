@@ -5,8 +5,10 @@ import type { BalanceSheet as BalanceSheetData } from "@/types/domain";
 const COLORS = {
   cash: "#5ec4b6",
   equipment: "#0f9d8a",
+  nmr: "#6366f1",
   loan: "#f08080",
   equity: "#3b82f6",
+  nmrGain: "#818cf8",
 } as const;
 
 type Block = {
@@ -77,7 +79,14 @@ function SheetColumn({
   );
 }
 
-export function BalanceSheetView({ sheet }: { sheet: BalanceSheetData }) {
+export function BalanceSheetView({
+  sheet,
+  nmrYen = null,
+}: {
+  sheet: BalanceSheetData;
+  nmrYen?: number | null;
+}) {
+  const nmr = nmrYen !== null && nmrYen > 0 ? Math.round(nmrYen) : 0;
   const assetBlocks: Block[] = [
     { key: "cash", label: "流動資産 現金", amount: sheet.cash, color: COLORS.cash },
     {
@@ -85,6 +94,12 @@ export function BalanceSheetView({ sheet }: { sheet: BalanceSheetData }) {
       label: "固定資産 機材",
       amount: sheet.equipment,
       color: COLORS.equipment,
+    },
+    {
+      key: "nmr",
+      label: "投資その他 NMR（時価）",
+      amount: nmr,
+      color: COLORS.nmr,
     },
   ];
   const rightBlocks: Block[] = [
@@ -100,25 +115,42 @@ export function BalanceSheetView({ sheet }: { sheet: BalanceSheetData }) {
       amount: Math.max(sheet.equity, 0),
       color: COLORS.equity,
     },
+    {
+      key: "nmr-gain",
+      label: "純資産 NMR評価差額",
+      amount: nmr,
+      color: COLORS.nmrGain,
+    },
   ];
-  const scale = Math.max(sheet.assets, sheet.loan + Math.max(sheet.equity, 0), 1);
+  const assetTotal = sheet.assets + nmr;
+  const rightTotal = sheet.loan + sheet.equity + nmr;
+  const scale = Math.max(assetTotal, sheet.loan + Math.max(sheet.equity, 0) + nmr, 1);
 
   return (
     <div>
       <div className="grid grid-cols-2 gap-2 sm:gap-4">
         <SheetColumn
           title="資産"
-          total={sheet.assets}
+          total={assetTotal}
           blocks={assetBlocks}
           scale={scale}
         />
         <SheetColumn
           title="負債・純資産"
-          total={sheet.loan + sheet.equity}
+          total={rightTotal}
           blocks={rightBlocks}
           scale={scale}
         />
       </div>
+      {nmrYen === null ? (
+        <p className="mt-3 text-sm text-zinc-500">
+          NMRの円はいま取れなかったよ。帳簿の左右は、現金と機材だけで合ってるよ。
+        </p>
+      ) : nmr > 0 ? (
+        <p className="mt-3 text-sm text-zinc-500">
+          NMRはいまの時価だよ。未確定のPayoutは収入に入れてないよ。
+        </p>
+      ) : null}
       {sheet.equity < 0 ? (
         <p className="mt-3 text-sm text-rose-600">
           純資産 {formatYen(sheet.equity)}。累計ではまだ赤字だよ。
