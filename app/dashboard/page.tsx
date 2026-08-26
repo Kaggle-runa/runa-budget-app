@@ -17,6 +17,7 @@ import {
 } from "@/lib/finance";
 import { formatAsOf } from "@/lib/format";
 import { getNmrQuote, getNumeraiSnapshot } from "@/lib/numerai";
+import { recordAndDiffNmrHoldings } from "@/lib/nmr-holdings";
 import { getLatestUpdatedAt, listTransactions } from "@/lib/queries";
 import { todayInJapan } from "@/lib/survival";
 import { buildTodayRunaFeed } from "@/lib/today-runa";
@@ -40,7 +41,8 @@ export default async function DashboardPage() {
     transactions.filter((tx) => tx.date.startsWith(monthKey)),
     "expense"
   );
-  const todayFeed = buildTodayRunaFeed(transactions, numerai, nmr);
+  const nmrDiff = await recordAndDiffNmrHoldings(numerai, nmr);
+  const todayFeed = buildTodayRunaFeed(transactions, numerai, nmr, undefined, nmrDiff);
 
   return (
     <PageShell currentPath="/dashboard">

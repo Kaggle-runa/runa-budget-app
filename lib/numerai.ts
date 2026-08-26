@@ -188,7 +188,13 @@ export function formatReturnPct(value: number | null): string {
 
 export function formatStakeNmr(value: number | null): string {
   if (value === null) return "—";
-  return `${value.toLocaleString("ja-JP", { maximumFractionDigits: 2 })} NMR`;
+  return `${value.toLocaleString("ja-JP", { maximumFractionDigits: 4 })} NMR`;
+}
+
+export function formatSignedNmr(value: number | null): string {
+  if (value === null) return "—";
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${value.toLocaleString("ja-JP", { maximumFractionDigits: 4 })} NMR`;
 }
 
 export function stakedNmr(models: NumeraiModelSnapshot[]): number | null {

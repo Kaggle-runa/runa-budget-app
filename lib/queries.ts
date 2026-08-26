@@ -288,3 +288,43 @@ export async function getLatestUpdatedAt(): Promise<Date | null> {
   if (dates.length === 0) return null;
   return dates.reduce((latest, date) => (date > latest ? date : latest));
 }
+
+export async function upsertNmrDailySnapshot(input: {
+  date: string;
+  nmrAmount: number;
+  stakedAmount: number | null;
+  yen: number;
+  usdPrice: number | null;
+  usdJpy: number | null;
+}): Promise<void> {
+  await prisma.nmrDailySnapshot.upsert({
+    where: { date: input.date },
+    create: input,
+    update: {
+      nmrAmount: input.nmrAmount,
+      stakedAmount: input.stakedAmount,
+      yen: input.yen,
+      usdPrice: input.usdPrice,
+      usdJpy: input.usdJpy,
+    },
+  });
+}
+
+export async function getLatestNmrDailySnapshotBefore(date: string): Promise<{
+  date: string;
+  nmrAmount: number;
+  stakedAmount: number | null;
+  yen: number;
+} | null> {
+  const row = await prisma.nmrDailySnapshot.findFirst({
+    where: { date: { lt: date } },
+    orderBy: { date: "desc" },
+  });
+  if (!row) return null;
+  return {
+    date: row.date,
+    nmrAmount: row.nmrAmount,
+    stakedAmount: row.stakedAmount,
+    yen: row.yen,
+  };
+}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { formatSignedYen, formatYen } from "@/lib/format";
+import { formatSignedNmr, formatStakeNmr } from "@/lib/numerai";
 import { cn } from "@/lib/utils";
 import { runaTodayComment, type TodayRunaFeed } from "@/lib/today-runa";
 
@@ -133,9 +134,22 @@ export function TodayRunaCard({ feed }: { feed: TodayRunaFeed }) {
           <p className={toneLabel(nmrTone)}>NMR</p>
           <div className="mt-3 space-y-1.5">
             <Row label="現在価値" value={nmrValue} />
-            <Row label="前日比" value={nmrDelta} tone={nmrTone} />
+            <Row label="いまのStake" value={formatStakeNmr(feed.nmr.staked)} />
+            <Row
+              label="Stake前日比"
+              value={formatSignedNmr(feed.nmr.stakeDelta)}
+              tone={toneOf(feed.nmr.stakeDelta)}
+            />
+            <Row label="円の前日比" value={nmrDelta} tone={nmrTone} />
             {nmrPct ? <Row label="変化率" value={nmrPct} tone={nmrTone} /> : null}
           </div>
+          <p className="mt-3 text-xs text-zinc-500">
+            {feed.nmr.deltaSource === "holdings"
+              ? feed.nmr.stakeDelta !== null
+                ? "Stake前日比は枚数の増減だよ。円の前日比は、価格の動きと枚数の変化を含むよ。"
+                : "円の前日比は昨日の円と比べてるよ。Stakeの枚数は、昨日の記録が残ってから出すよ。"
+              : "いまは価格の24時間変化だけだよ。昨日のStakeが残ったら、支給も枚数で出るよ。"}
+          </p>
         </div>
       </div>
 

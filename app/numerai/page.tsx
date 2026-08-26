@@ -6,6 +6,7 @@ import { NumeraiIntro } from "@/components/numerai/intro";
 import { NumeraiModelCard } from "@/components/numerai/model-card";
 import { PageHeading } from "@/components/layout/page-heading";
 import { PageShell } from "@/components/layout/page-shell";
+import { recordAndDiffNmrHoldings } from "@/lib/nmr-holdings";
 import { runaModelComment } from "@/lib/numerai-copy";
 import { getNmrQuote, getNumeraiSnapshot } from "@/lib/numerai";
 
@@ -18,6 +19,7 @@ export default async function NumeraiPage() {
     ? `${format(new Date(snapshot.fetchedAt), "yyyy年M月d日")}時点の情報だよ。`
     : null;
   const comment = runaModelComment(snapshot.models, quote, snapshot.ok);
+  await recordAndDiffNmrHoldings(snapshot, quote);
 
   return (
     <PageShell currentPath="/numerai">

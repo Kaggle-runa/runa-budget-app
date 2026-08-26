@@ -51,6 +51,8 @@ components/numerai/
 
 読み取りのみ。Numerai GraphQL と価格は `getNumeraiSnapshot` / `getNmrQuote`（1時間キャッシュ、tag `numerai`）。
 24h 変化は CoinGecko → CoinPaprika → Binance。Render の IP では CoinGecko が 429 になりやすい。
+保有の前日比は `NmrDailySnapshot`（日本時間の日付キー）。円の前日比は今日の円 − 直近の過去日の円。Stake前日比は Stake 枚数の差。昨日が無い初回は円だけ価格の24h変化、Stakeは「—」。
+`recordAndDiffNmrHoldings` は公開ページと `/admin/numerai` の取り直しで書く。
 管理の `/admin/numerai` から `refreshNumeraiAction` で tag を破棄して取り直し、`/` / `/dashboard` / `/numerai` を再検証する。
 
 ## 第1版でやらない

@@ -1,6 +1,7 @@
 import { dateKey } from "@/lib/finance";
 import { formatAsOf } from "@/lib/format";
-import { getNmrQuote, getNumeraiSnapshot, toYen, totalNmr, yenDelta24h } from "@/lib/numerai";
+import { recordAndDiffNmrHoldings, currentNmrHoldings } from "@/lib/nmr-holdings";
+import { getNmrQuote, getNumeraiSnapshot } from "@/lib/numerai";
 import {
   getLatestUpdatedAt,
   listEvents,
@@ -27,15 +28,8 @@ export async function buildApiStatus() {
   const todayKey = dateKey(today);
   const survival = summarizeSurvival(transactions, today);
   const challenges = summarizeChallenges(transactions, projects);
-  const amount = totalNmr(numerai.models, numerai.wallet?.availableNmr ?? null);
-  const usdNow =
-    amount !== null && quote.usdPrice !== null ? amount * quote.usdPrice : null;
-  const yenNow =
-    usdNow !== null && quote.usdJpy !== null ? toYen(usdNow, quote.usdJpy) : null;
-  const yenDelta =
-    usdNow !== null && quote.change24h !== null && quote.usdJpy !== null
-      ? yenDelta24h(usdNow, quote.change24h, quote.usdJpy)
-      : null;
+  const { yenNow, staked } = currentNmrHoldings(numerai, quote);
+  const diff = await recordAndDiffNmrHoldings(numerai, quote);
 
   const startOfToday = new Date(`${todayKey}T00:00:00+09:00`);
   const upcoming = events
@@ -64,10 +58,12 @@ export async function buildApiStatus() {
     },
     nmr: {
       yenNow,
-      yenDelta,
-      change24h: quote.change24h,
+      yenDelta: diff.yenDelta,
+      change24h: diff.change24h,
+      staked,
+      stakeDelta: diff.stakeDelta,
       includedInProfit: false,
-      note: "NMRの円は評価額。総資産には入れる。損益・自給率・現金には入れない。",
+      note: "NMRの円は評価額。円の前日比は価格と枚数の変化を含む。stakeDelta は Stake 枚数の差。総資産には入れる。損益・自給率・現金には入れない。",
     },
     challenges,
     recentTransactions: transactions.slice(0, 10),

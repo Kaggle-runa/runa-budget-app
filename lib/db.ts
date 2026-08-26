@@ -2,7 +2,7 @@ import path from "node:path";
 import { PrismaClient } from "@prisma/client";
 import { PrismaClient as SqlitePrismaClient } from "@/lib/generated/sqlite";
 
-const CLIENT_MARK = "db-switch-v3";
+const CLIENT_MARK = "db-switch-v5";
 type AppPrisma = PrismaClient & { __runaMark?: string };
 const globalForPrisma = globalThis as unknown as { prisma?: AppPrisma };
 
@@ -34,7 +34,7 @@ function createPrisma() {
 function isCurrentClient(client: AppPrisma) {
   return (
     client.__runaMark === CLIENT_MARK + (isLocalSqlite() ? "-sqlite" : "-pg") &&
-    typeof client.comicStrip?.findFirst === "function"
+    typeof client.nmrDailySnapshot?.findFirst === "function"
   );
 }
 

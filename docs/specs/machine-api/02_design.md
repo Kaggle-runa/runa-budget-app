@@ -28,7 +28,7 @@ HTML 画面は増えない。JSON のみ。
 
 ## データモデル
 
-新しいテーブルは無い。
+新しいテーブルは `NmrDailySnapshot`（NMR 前日比用）。明細・予定は既存。
 
 ## コンポーネント構成
 
@@ -57,5 +57,5 @@ lib/events.ts
 
 ## NMR
 
-`status.nmr` に円換算と前日比。`includedInProfit` は常に false。自給率の式は変えない。
+`status.nmr` に円換算と前日比。円の前日比は日次スナップショットの円の差（価格＋枚数）。`stakeDelta` は Stake 枚数の差。昨日が無いときは円は価格の24h変化、Stakeは null。`includedInProfit` は常に false。自給率の式は変えない。
 `status.assets` は `現金 + 機材 + NMR円`。損益には入れない。

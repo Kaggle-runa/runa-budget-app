@@ -142,6 +142,14 @@ export type NmrQuote = {
   usdJpy: number | null;
 };
 
+export type NmrHoldingsDiff = {
+  yenDelta: number | null;
+  change24h: number | null;
+  stakeDelta: number | null;
+  source: "holdings" | "price";
+  previousDate: string | null;
+};
+
 export type BalanceSheet = {
   cash: number;
   equipment: number;

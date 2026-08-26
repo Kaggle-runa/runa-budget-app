@@ -7,6 +7,7 @@ import {
   getNmrQuote,
   getNumeraiSnapshot,
 } from "@/lib/numerai";
+import { recordAndDiffNmrHoldings } from "@/lib/nmr-holdings";
 
 export async function refreshNumeraiAction(): Promise<{
   error?: string;
@@ -15,7 +16,13 @@ export async function refreshNumeraiAction(): Promise<{
 }> {
   await requireAdmin();
   revalidateTag(NUMERAI_CACHE_TAG);
-  const [snapshot] = await Promise.all([getNumeraiSnapshot(), getNmrQuote()]);
+  const [snapshot, quote] = await Promise.all([
+    getNumeraiSnapshot(),
+    getNmrQuote(),
+  ]);
+  if (snapshot.ok) {
+    await recordAndDiffNmrHoldings(snapshot, quote);
+  }
   revalidatePath("/");
   revalidatePath("/dashboard");
   revalidatePath("/numerai");

@@ -1,17 +1,21 @@
 import { categoryLabel } from "@/lib/categories";
 import { dateKey, dayNet, signedLedgerAmount } from "@/lib/finance";
 import { formatSignedYen } from "@/lib/format";
-import { toYen, totalNmr, yenDelta24h } from "@/lib/numerai";
+import { stakedNmr, toYen, totalNmr, yenDelta24h } from "@/lib/numerai";
 import { todayInJapan } from "@/lib/survival";
-import type { NmrQuote, NumeraiSnapshot, TransactionDTO } from "@/types/domain";
+import type { NmrHoldingsDiff, NmrQuote, NumeraiSnapshot, TransactionDTO } from "@/types/domain";
 
 export type TodayRunaNmr = {
   amount: number | null;
+  staked: number | null;
   usdPrice: number | null;
   usdJpy: number | null;
   yenNow: number | null;
   yenDelta: number | null;
   change24h: number | null;
+  stakeDelta: number | null;
+  deltaSource: "holdings" | "price";
+  previousDate: string | null;
 };
 
 export type TodayRunaLine = {
@@ -49,21 +53,29 @@ export function buildTodayRunaFeed(
   transactions: TransactionDTO[],
   numerai: NumeraiSnapshot,
   quote: NmrQuote,
-  today = todayInJapan()
+  today = todayInJapan(),
+  holdingsDiff?: NmrHoldingsDiff
 ): TodayRunaFeed {
   const date = dateKey(today);
   const amount = totalNmr(
     numerai.models,
     numerai.wallet?.availableNmr ?? null
   );
+  const staked = stakedNmr(numerai.models);
   const usdNow =
     amount !== null && quote.usdPrice !== null ? amount * quote.usdPrice : null;
   const yenNow =
     usdNow !== null && quote.usdJpy !== null ? toYen(usdNow, quote.usdJpy) : null;
   const yenDelta =
-    usdNow !== null && quote.change24h !== null && quote.usdJpy !== null
-      ? yenDelta24h(usdNow, quote.change24h, quote.usdJpy)
-      : null;
+    holdingsDiff?.yenDelta !== undefined
+      ? holdingsDiff.yenDelta
+      : usdNow !== null && quote.change24h !== null && quote.usdJpy !== null
+        ? yenDelta24h(usdNow, quote.change24h, quote.usdJpy)
+        : null;
+  const change24h =
+    holdingsDiff?.change24h !== undefined
+      ? holdingsDiff.change24h
+      : quote.change24h;
 
   const todayTx = transactions
     .filter(
@@ -100,11 +112,15 @@ export function buildTodayRunaFeed(
     lines,
     nmr: {
       amount,
+      staked,
       usdPrice: quote.usdPrice,
       usdJpy: quote.usdJpy,
       yenNow,
       yenDelta,
-      change24h: quote.change24h,
+      change24h,
+      stakeDelta: holdingsDiff?.stakeDelta ?? null,
+      deltaSource: holdingsDiff?.source ?? "price",
+      previousDate: holdingsDiff?.previousDate ?? null,
     },
   };
 }

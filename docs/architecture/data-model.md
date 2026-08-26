@@ -166,6 +166,19 @@ erDiagram
 
 インデックス: `published`, `sortOrder`
 
+## NmrDailySnapshot
+
+日本時間の日付ごとに、NMR の枚数と円を1行残す。円の前日比（価格＋支給・没収）と Stake 前日比の一次データ。
+
+| 列 | 型 | 必須 | 値 |
+|----|----|------|-----|
+| date | text | yes | `yyyy-MM-dd`（日本時間）。unique |
+| nmrAmount | float | yes | Stake合計 + 未ステーク |
+| stakedAmount | float | no | モデルの Stake 合計。前日比の枚数用 |
+| yen | int | yes | その時点の円 |
+| usdPrice | float | no | NMR/USD |
+| usdJpy | float | no | ドル円 |
+
 ## 置かないもの
 
 - 視聴者アカウント（企画投稿は都度入力）

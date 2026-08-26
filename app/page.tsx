@@ -12,6 +12,7 @@ import { SurvivalChallengeCard } from "@/components/survival/challenge-card";
 import { SurvivalStatusBoard } from "@/components/survival/status-board";
 import { SITE } from "@/lib/constants";
 import { formatAsOf } from "@/lib/format";
+import { recordAndDiffNmrHoldings } from "@/lib/nmr-holdings";
 import { getNmrQuote, getNumeraiSnapshot } from "@/lib/numerai";
 import { buildTodayRunaFeed } from "@/lib/today-runa";
 import {
@@ -49,7 +50,8 @@ export default async function HomePage() {
     summarizeChallenges(transactions, projects),
     ideas
   );
-  const todayFeed = buildTodayRunaFeed(transactions, numerai, nmr);
+  const nmrDiff = await recordAndDiffNmrHoldings(numerai, nmr);
+  const todayFeed = buildTodayRunaFeed(transactions, numerai, nmr, undefined, nmrDiff);
 
   return (
     <PageShell currentPath="/">

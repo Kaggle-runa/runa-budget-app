@@ -103,3 +103,15 @@ model ComicStrip {
   @@index([published])
   @@index([sortOrder])
 }
+
+model NmrDailySnapshot {
+  id           String   @id @default(cuid())
+  date         String   @unique
+  nmrAmount    Float
+  stakedAmount Float?
+  yen          Int
+  usdPrice     Float?
+  usdJpy       Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
