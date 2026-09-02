@@ -173,7 +173,7 @@ erDiagram
 | 列 | 型 | 必須 | 値 |
 |----|----|------|-----|
 | date | text | yes | `yyyy-MM-dd`（日本時間）。unique |
-| nmrAmount | float | yes | Stake合計 + 未ステーク |
+| nmrAmount | float | yes | Stake合計 + 旧ウォレット残高 |
 | stakedAmount | float | no | モデルの Stake 合計。前日比の枚数用 |
 | yen | int | yes | その時点の円 |
 | usdPrice | float | no | NMR/USD |

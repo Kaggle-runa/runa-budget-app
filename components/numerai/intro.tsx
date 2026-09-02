@@ -18,7 +18,7 @@ const TERMS = [
     name: "Stake",
     icon: "💰",
     oneLiner: "僕がこの予測に預けているNMR（仮想通貨）",
-    body: "僕の予測にNMRをStake（賭ける）している量だよ。成績によって増えたり減ったりするんだ。",
+    body: "僕の予測にNMRをStake（賭ける）している量だよ。ラウンドごとにオンチェーンでロックされて、成績によって増えたり減ったりするんだ。昔のウォレット残高とは別だよ。",
   },
 ] as const;
 
@@ -31,7 +31,7 @@ export function NumeraiIntro() {
           Numeraiは、金融データを使って予測モデルの精度を競うデータサイエンス大会だよ。
         </p>
         <p>
-          モデルの成績にNMR（仮想通貨）をStake（賭ける）すると、結果に応じて増えたり減ったりするんだ。
+          モデルの成績にNMR（仮想通貨）をStake（賭ける）すると、結果に応じて増えたり減ったりするんだ。いまはラウンドごとにオンチェーンでロックする方式だよ。
         </p>
         <details className="rounded-xl bg-sky-50/80 px-4 py-3">
           <summary className="cursor-pointer text-sm font-semibold text-secondary">
@@ -53,6 +53,15 @@ export function NumeraiIntro() {
                 className="text-secondary underline"
               >
                 Numerai Docs
+              </Link>
+              、Stakeの置き方は{" "}
+              <Link
+                href={SITE.numeraiStakingUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-secondary underline"
+              >
+                Atomic Blockchain Staking
               </Link>{" "}
               に載ってるよ。日本語で読みたい場合は{" "}
               <Link

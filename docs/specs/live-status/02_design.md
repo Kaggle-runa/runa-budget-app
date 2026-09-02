@@ -4,23 +4,25 @@
 
 | パス | 画面 | 概要 |
 |------|------|------|
-| `/numerai` | ルナのモデル観察 | ヒーロー（Stake総額）→ モデルカード → ルナのひとこと → Numerai の短い説明 |
+| `/numerai` | ルナのモデル観察 | ヒーロー（Stake総額）→ いまの大会 → モデルカード → ルナのひとこと → Numerai の短い説明 |
 
 トップのヒーロー直下は総資産（現金 + 機材 + NMR円）。「いまのルナの状況」は [dashboard](../dashboard/02_design.md) と [channel-home](../channel-home/02_design.md)。
 
 ## `/numerai` の順序
 
-1. ヒーロー: 「僕自身がAIなのに、AIモデルを育ててるよ。」Stake総額（円）とモデル数
-2. モデルカード: 1号機 / 2号機。主役は Stake の円。CORR / MMC / Rank は一段小さく
-3. ルナのひとこと: API の数字からルールで一文。LLM は使わない
-4. Numeraiってなに: 2段落 + 「もう少し詳しく見る」
-5. CORR / MMC / Stake の3カード（見出し直下に一言）
+1. ヒーロー: 総NMR（枚数と円）と Stake中（枚数と円）。ラウンド番号があれば添える
+2. いまの大会: ラウンド / 評価期間 / 支払い対象（`roundScoreConfigs` の `isPayout`）。Multiplier はハードコードしない
+3. モデルカード: 1号機 / 2号機。主役は Stake の円。CORR / MMC / Rank は一段小さく（`latestReps`。支払い対象そのものではない）
+4. ルナのひとこと: API の数字からルールで一文。LLM は使わない
+5. Numeraiってなに: 2段落 + 「もう少し詳しく見る」
+6. CORR / MMC / Stake の3カード（見出し直下に一言）。Stake はオンチェーンロックであり旧ウォレットとは別
 
 ## コンポーネント
 
 ```
 components/numerai/
 ├── hero.tsx
+├── round-status.tsx
 ├── model-card.tsx
 ├── comment.tsx
 └── intro.tsx
@@ -50,6 +52,8 @@ components/numerai/
 ## 更新経路
 
 読み取りのみ。Numerai GraphQL と価格は `getNumeraiSnapshot` / `getNmrQuote`（1時間キャッシュ、tag `numerai`）。
+Stake は `v3UserProfile.stakeValue`。大会設定は `rounds(number: 0).roundScoreConfigs`。旧ウォレットは `account.availableNmr`（任意トークン）。
+`defaultCorrMultiplier` / `corrMultiplier` は使わない。`v3StakeAuth` / `v3StakeClaim` は書かない。
 24h 変化は CoinGecko → CoinPaprika → Binance。Render の IP では CoinGecko が 429 になりやすい。
 保有の前日比は `NmrDailySnapshot`（日本時間の日付キー）。円の前日比は今日の円 − 直近の過去日の円。Stake前日比は Stake 枚数の差。昨日が無い初回は円だけ価格の24h変化、Stakeは「—」。
 `recordAndDiffNmrHoldings` は公開ページと `/admin/numerai` の取り直しで書く。
@@ -58,3 +62,4 @@ components/numerai/
 ## 第1版でやらない
 
 モデル比較表、提出バージョン履歴、LLM 短評、評価の進捗バー。
+Idle / Claimable の内訳、ラウンドごとのロック枚数、`v3StakeRound` の全体集計。

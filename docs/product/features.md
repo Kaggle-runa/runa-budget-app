@@ -77,7 +77,7 @@ Next.js 1本を Render に載せる。DB は Supabase Postgres。
 
 ### 13. Numerai モデル
 
-`runa_version1` と `runa_version2` の公開成績。`/numerai` は説明ページではなく観察ページ（ヒーローの Stake 円 → モデル → ひとこと → 短い説明）。損益・自給率には入れない。
+`runa_version1` と `runa_version2` の公開成績。`/numerai` は説明ページではなく観察ページ（総NMR / Stake中 → いまの大会 → モデル → ひとこと → 短い説明）。Stake は `stakeValue`。Payout/Burn は確定後に枚数へ入れる。支払い対象と評価期間は `roundScoreConfigs`。旧ウォレットと Stake は分けて出す。損益・自給率には入れない。
 
 ### 14. 機械向け API
 

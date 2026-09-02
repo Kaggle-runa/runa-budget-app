@@ -7,4 +7,6 @@
 - [x] 6. 管理画面から Numerai を手動取得
 - [x] 7. NMR 日次スナップショットで支給・没収込みの前日比
 - [x] 8. Stake前日比（枚数）を今日のルナに出す
+- [x] 9. Atomic Staking 後の大会設定（roundScoreConfigs）とウォレット/Stakeの切り分け
+- [x] 10. 総NMRとStake中を分け、Payout/Burnは確定後の枚数だけ見る
 - [ ] 5. 経済活動ログ（別スライス）

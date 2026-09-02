@@ -4,6 +4,7 @@ import { NumeraiComment } from "@/components/numerai/comment";
 import { NumeraiHero } from "@/components/numerai/hero";
 import { NumeraiIntro } from "@/components/numerai/intro";
 import { NumeraiModelCard } from "@/components/numerai/model-card";
+import { NumeraiRoundStatus } from "@/components/numerai/round-status";
 import { PageHeading } from "@/components/layout/page-heading";
 import { PageShell } from "@/components/layout/page-shell";
 import { recordAndDiffNmrHoldings } from "@/lib/nmr-holdings";
@@ -32,6 +33,7 @@ export default async function NumeraiPage() {
 
       <div className="space-y-8">
         <NumeraiHero snapshot={snapshot} quote={quote} />
+        <NumeraiRoundStatus round={snapshot.round} />
 
         {snapshot.ok ? null : (
           <p className="max-w-3xl text-sm text-muted-foreground">

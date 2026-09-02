@@ -126,12 +126,31 @@ export type NumeraiModelSnapshot = {
 };
 
 export type NumeraiWallet = {
+  /** 旧 Numerai Wallet。Atomic Staking 以降はステーキングに使わない */
   availableNmr: number | null;
+};
+
+export type NumeraiPayoutScore = {
+  scoreConfigId: string;
+  name: string;
+  version: string;
+  displayName: string;
+  defaultMultiplier: number | null;
+  totalScoreDays: number | null;
+};
+
+export type NumeraiRoundSnapshot = {
+  number: number;
+  target: string | null;
+  resolveTime: string | null;
+  payoutScores: NumeraiPayoutScore[];
+  scoringDays: number | null;
 };
 
 export type NumeraiSnapshot = {
   models: NumeraiModelSnapshot[];
   wallet: NumeraiWallet | null;
+  round: NumeraiRoundSnapshot | null;
   fetchedAt: string | null;
   ok: boolean;
 };

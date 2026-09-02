@@ -62,7 +62,7 @@ npm run dev
    - LLM から明細を書くなら `RUNA_API_TOKEN`（16文字以上。`openssl rand -hex 32`）
    - `GOOGLE_FORM_URL`（問い合わせの Google フォーム）
    - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`（お知らせ・4コマ画像。Settings > API）
-   - `NUMERAI_PUBLIC_ID` / `NUMERAI_SECRET_KEY`（任意。未ステーク NMR。スコープは `read_user_info` だけ）
+   - `NUMERAI_PUBLIC_ID` / `NUMERAI_SECRET_KEY`（任意。旧ウォレット残高。スコープは `read_user_info` だけ）
 5. デプロイ後、`https://<service>.onrender.com/admin/login` で管理ログイン
 
 `render.yaml` を置いてあるので、Blueprint から作ってもよい。値は Dashboard で入れる。

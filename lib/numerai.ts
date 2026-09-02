@@ -4,6 +4,8 @@ import { getNumeraiApiToken } from "@/lib/env";
 import type {
   NmrQuote,
   NumeraiModelSnapshot,
+  NumeraiPayoutScore,
+  NumeraiRoundSnapshot,
   NumeraiSnapshot,
   NumeraiWallet,
 } from "@/types/domain";
@@ -43,6 +45,44 @@ query {
   }
 }
 `;
+
+const ROUND_QUERY = `
+query($tournament: Int, $number: Int) {
+  rounds(tournament: $tournament, number: $number) {
+    number
+    target
+    resolveTime
+    roundScoreConfigs {
+      scoreConfigId
+      name
+      version
+      displayName
+      isPayout
+      defaultMultiplier
+      totalScoreDays
+    }
+  }
+}
+`;
+
+type RoundPayload = {
+  data?: {
+    rounds?: {
+      number?: number;
+      target?: string | null;
+      resolveTime?: string | null;
+      roundScoreConfigs?: {
+        scoreConfigId?: string | null;
+        name?: string | null;
+        version?: string | null;
+        displayName?: string | null;
+        isPayout?: boolean | null;
+        defaultMultiplier?: number | null;
+        totalScoreDays?: number | null;
+      }[];
+    }[];
+  };
+};
 
 type ProfilePayload = {
   data?: {
@@ -114,6 +154,45 @@ async function fetchProfile(modelName: string): Promise<ProfilePayload["data"]> 
   return json.data;
 }
 
+function parseRound(payload: RoundPayload["data"]): NumeraiRoundSnapshot | null {
+  const round = payload?.rounds?.[0];
+  if (!round?.number) return null;
+  const payoutScores: NumeraiPayoutScore[] = (round.roundScoreConfigs ?? [])
+    .filter((config) => config.isPayout)
+    .map((config) => ({
+      scoreConfigId: config.scoreConfigId ?? "",
+      name: config.name ?? "",
+      version: config.version ?? "",
+      displayName: config.displayName ?? config.name ?? "",
+      defaultMultiplier: toNumber(config.defaultMultiplier),
+      totalScoreDays: toNumber(config.totalScoreDays),
+    }));
+  const scoringDays = payoutScores.reduce<number | null>((max, score) => {
+    if (score.totalScoreDays === null) return max;
+    if (max === null) return score.totalScoreDays;
+    return Math.max(max, score.totalScoreDays);
+  }, null);
+  return {
+    number: round.number,
+    target: round.target ?? null,
+    resolveTime: round.resolveTime ?? null,
+    payoutScores,
+    scoringDays,
+  };
+}
+
+async function fetchCurrentRound(): Promise<NumeraiRoundSnapshot | null> {
+  try {
+    const json = await numeraiGraphql<RoundPayload>(ROUND_QUERY, {
+      tournament: 8,
+      number: 0,
+    });
+    return parseRound(json.data);
+  } catch {
+    return null;
+  }
+}
+
 async function fetchWallet(token: string): Promise<NumeraiWallet | null> {
   try {
     const json = await numeraiGraphql<{
@@ -130,7 +209,7 @@ async function fetchWallet(token: string): Promise<NumeraiWallet | null> {
 async function loadNumeraiSnapshot(): Promise<NumeraiSnapshot> {
   try {
     const token = getNumeraiApiToken();
-    const [models, wallet] = await Promise.all([
+    const [models, wallet, round] = await Promise.all([
       Promise.all(
         NUMERAI_MODELS.map(async (meta) => {
           const data = await fetchProfile(meta.name);
@@ -152,10 +231,12 @@ async function loadNumeraiSnapshot(): Promise<NumeraiSnapshot> {
         })
       ),
       token ? fetchWallet(token) : Promise.resolve(null),
+      fetchCurrentRound(),
     ]);
     return {
       models,
       wallet,
+      round,
       fetchedAt: new Date().toISOString(),
       ok: true,
     };
@@ -163,6 +244,7 @@ async function loadNumeraiSnapshot(): Promise<NumeraiSnapshot> {
     return {
       models: NUMERAI_MODELS.map(emptyModel),
       wallet: null,
+      round: null,
       fetchedAt: null,
       ok: false,
     };
@@ -171,7 +253,7 @@ async function loadNumeraiSnapshot(): Promise<NumeraiSnapshot> {
 
 export const getNumeraiSnapshot = unstable_cache(
   loadNumeraiSnapshot,
-  ["numerai-snapshot-stake-nmr-v2"],
+  ["numerai-snapshot-atomic-v1"],
   { revalidate: 3600, tags: [NUMERAI_CACHE_TAG] }
 );
 
@@ -195,6 +277,25 @@ export function formatSignedNmr(value: number | null): string {
   if (value === null) return "—";
   const sign = value > 0 ? "+" : "";
   return `${sign}${value.toLocaleString("ja-JP", { maximumFractionDigits: 4 })} NMR`;
+}
+
+export function formatPayoutMultiplier(value: number | null): string {
+  if (value === null) return "—";
+  const formatted =
+    Number.isInteger(value) ? String(value) : value.toLocaleString("ja-JP", { maximumFractionDigits: 2 });
+  return `×${formatted}`;
+}
+
+export function formatRoundTarget(
+  target: string | null,
+  scoringDays: number | null
+): string {
+  if (target === "target_ender_60") {
+    return scoringDays !== null ? `Ender ${scoringDays}日` : "Ender 60日";
+  }
+  if (scoringDays !== null) return `${scoringDays}日`;
+  if (!target) return "—";
+  return target.replace(/^target_/, "").replace(/_/g, " ");
 }
 
 export function stakedNmr(models: NumeraiModelSnapshot[]): number | null {

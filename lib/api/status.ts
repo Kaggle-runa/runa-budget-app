@@ -28,7 +28,7 @@ export async function buildApiStatus() {
   const todayKey = dateKey(today);
   const survival = summarizeSurvival(transactions, today);
   const challenges = summarizeChallenges(transactions, projects);
-  const { yenNow, staked } = currentNmrHoldings(numerai, quote);
+  const { yenNow, staked, amount } = currentNmrHoldings(numerai, quote);
   const diff = await recordAndDiffNmrHoldings(numerai, quote);
 
   const startOfToday = new Date(`${todayKey}T00:00:00+09:00`);
@@ -57,13 +57,15 @@ export async function buildApiStatus() {
       note: "総資産 = 現金 + 機材 + NMR円。損益・自給率にはNMRを入れない。",
     },
     nmr: {
+      amount,
+      staked,
+      available: numerai.wallet?.availableNmr ?? null,
       yenNow,
       yenDelta: diff.yenDelta,
       change24h: diff.change24h,
-      staked,
       stakeDelta: diff.stakeDelta,
       includedInProfit: false,
-      note: "NMRの円は評価額。円の前日比は価格と枚数の変化を含む。stakeDelta は Stake 枚数の差。総資産には入れる。損益・自給率・現金には入れない。",
+      note: "amount は総NMR、staked は Stake中。Payout/Burn は確定後に staked へ入る。未確定は損益に入れない。",
     },
     challenges,
     recentTransactions: transactions.slice(0, 10),

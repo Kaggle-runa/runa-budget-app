@@ -56,7 +56,7 @@ NMR の値動き・未確定の payout は損益に入れない。総資産の�
 - [x] 公開 API からモデルの CORR / MMC / Stake / ランク / 直近リターンを取る
 - [x] トップと収支の「今日のルナ」に Numerai の日次（NMR の円換算と%、いまの CORR）を出せる。CORR の昨日比は未保存
 - [x] NMR 前日比は日次スナップショット同士の円の差（価格＋枚数）。Stake前日比は枚数の差。昨日が無いときは円は価格の24h変化、Stakeは出さない
-- [x] 評価期間（20日 / 60日）があること、未確定の payout は確定ではないことを一文で書く
+- [x] 評価期間は `roundScoreConfigs` の支払い対象（`isPayout`）から出す。未確定の payout は確定ではないことを一文で書く
 - [x] Numerai とは何かを、公式の趣旨で一般向けに説明する
 - [x] `/numerai` は説明ページではなく観察ページ。順序は ルナの状態 → モデル → ひとこと → 短い説明
 - [x] 総資産に NMR を円換算で足す。換算レートと時点を出す。自給率には入れない
@@ -111,28 +111,35 @@ NMR の値動き・未確定の payout は損益に入れない。総資産の�
 | 数字 | 型 | 経路 |
 |------|----|------|
 | モデルの Stake | `Nmr` | `v3UserProfile.stakeValue`。画面の「3.45 NMR」と同じ。未確定ラウンド込み |
-| モデルの成績 | 数値 | `latestReps` / `latestRanks` / `latestReturns` |
+| モデルの成績 | 数値 | `latestReps` / `latestRanks` / `latestReturns`（総合ステータス。支払い対象そのものではない） |
+| いまのラウンド | 数値 / 配列 | `rounds(number: 0)` → `target` と `roundScoreConfigs`。支払い対象は `isPayout` |
 | NMR の公式USD価格 | 文字列 | `latestNmrPrice.priceUsd` |
 
 公開では取れないもの（`account` はログイン中の自分の口座）:
 
 | 数字 | 型 | 経路 |
 |------|----|------|
-| 未ステーク（Numerai口座） | `Nmr` | `account.availableNmr`。スコープ `read_user_info` |
+| 旧ウォレット残高 | `Nmr` | `account.availableNmr`。スコープ `read_user_info`。Atomic Staking 以降はステーキングに使わない |
 | 出金待ち | `Nmr` | `account.heldForPendingWithdrawals` |
 | オンチェーン残高 | `Nmr` | `account.onChainWalletBalance` |
 
 `v3UserProfile` に `nmrStaked` は無い。以前 USD と読んでいた `stakeValue` は **NMR**。
+Classic は Round 1343 から Atomic Blockchain Staking と Ender 60日。Multiplier は `defaultCorrMultiplier` ではなく `roundScoreConfigs[].defaultMultiplier`。
+NMRトークン自体の入れ替えではない。保管先とロックの仕組みが変わった。
 
 円換算:
 
 `円 = (stakeValue の合計 + availableNmr) × NMR/USD × ドル円`
 
+`availableNmr` は旧ウォレットの残り。Stake とは別。公開カードは総NMR（Stake + 旧ウォレット）と Stake中を分ける。
+Payout / Burn はラウンド確定後に `stakeValue` へ入った分だけ見る。未確定の請求（`v3StakeClaim`）は出さない。Idle / Claimable の内訳は第1版では出さない。
+
 NMR/USD は Numerai の `latestNmrPrice`、だめなら CoinGecko。24h 変化は CoinGecko、だめなら CoinPaprika / Binance。ドル円は open.er-api.com、だめなら Frankfurter。
 帳簿の損益には入れない。提出用の秘密情報は置かない。
+`v3StakeAuth` / `v3StakeClaim` は書かない（提出・請求用）。
 
 ## 確認したいこと
 
 1. ~~サイトに出すモデルは `soramame` を主役にして、exp005 / exp007 も並べるか~~ → `runa_version1` と `runa_version2`
 2. 先に進めるスライス（ログ → Numerai の順でよいか）
-3. ウォレット残高は API の `availableNmr` を正としてよいか（読み取りトークンを本番 env に足す）→ 未ステークは `availableNmr`。トークンは任意の env。
+3. ウォレット残高は API の `availableNmr` を正としてよいか（読み取りトークンを本番 env に足す）→ 旧ウォレットは `availableNmr`。トークンは任意の env。ステーキングには使わない。

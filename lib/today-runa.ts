@@ -8,6 +8,7 @@ import type { NmrHoldingsDiff, NmrQuote, NumeraiSnapshot, TransactionDTO } from 
 export type TodayRunaNmr = {
   amount: number | null;
   staked: number | null;
+  available: number | null;
   usdPrice: number | null;
   usdJpy: number | null;
   yenNow: number | null;
@@ -113,6 +114,7 @@ export function buildTodayRunaFeed(
     nmr: {
       amount,
       staked,
+      available: numerai.wallet?.availableNmr ?? null,
       usdPrice: quote.usdPrice,
       usdJpy: quote.usdJpy,
       yenNow,

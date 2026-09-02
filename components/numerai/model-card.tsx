@@ -123,6 +123,7 @@ export function NumeraiModelCard({
 
           <div className="mt-4">
             <p className="text-sm font-semibold text-zinc-800">🤖 総合ステータス</p>
+            <p className="mt-0.5 text-xs text-zinc-500">長期の成績だよ。今回の支払いは上の大会カードを見てね。</p>
             <div className="mt-2 grid grid-cols-3 gap-3">
               <MiniStat label="CORR" value={formatCorr(model.corr)} />
               <MiniStat label="MMC" value={formatCorr(model.mmc)} />

@@ -21,7 +21,7 @@
 
 `app/page.tsx` が `PageShell` と生存ボードを組み立てる。コピーは `lib/constants.ts`。
 生存KPIは `lib/survival.ts`、UI は `components/survival/`。
-いまのルナの状況は `components/dashboard/today-runa.tsx`。お仕事と NMR を分け、「今日の資産増減」は仕事の収支 + NMR 円の前日比（価格と枚数）。NMRカードに Stake 前日比（枚数）も出す。
+いまのルナの状況は `components/dashboard/today-runa.tsx`。お仕事と NMR を分け、「今日の資産増減」は仕事の収支 + NMR 円の前日比（価格と枚数）。NMRカードは総NMRと Stake中を分け、確定後の Payout/Burn だけ枚数に入れる。
 
 ヒーローCTA: 「今日のルナを見る」→ `/dashboard`、「次の仕事を提案する」→ `/ideas`。
 現在の挑戦は進行中を複数出せる。これまでの結果は `/ideas#past` へ。

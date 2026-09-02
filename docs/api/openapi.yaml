@@ -43,7 +43,7 @@ paths:
       summary: 生存KPI・総資産・NMR円・直近の明細と予定。施策を考える入口
       responses:
         "200":
-          description: 現状。assets.total は現金+機材+NMR円。nmr.includedInProfit は常に false。nmr.stakeDelta は Stake 枚数の前日比
+          description: 現状。assets.total は現金+機材+NMR円。nmr.amount は総NMR、nmr.staked は Stake中。未確定の Payout/Burn は損益に入れない
         "401":
           $ref: "#/components/responses/Unauthorized"
   /api/v1/projects:

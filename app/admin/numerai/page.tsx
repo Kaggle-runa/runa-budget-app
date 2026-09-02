@@ -3,7 +3,15 @@ import { NumeraiRefreshForm } from "@/components/admin/numerai-refresh";
 import { GlassCard } from "@/components/layout/glass-card";
 import { getNumeraiApiToken } from "@/lib/env";
 import { formatYen } from "@/lib/format";
-import { formatStakeNmr, getNmrQuote, getNumeraiSnapshot, toYen, totalNmr } from "@/lib/numerai";
+import {
+  formatPayoutMultiplier,
+  formatRoundTarget,
+  formatStakeNmr,
+  getNmrQuote,
+  getNumeraiSnapshot,
+  toYen,
+  totalNmr,
+} from "@/lib/numerai";
 
 export default async function AdminNumeraiPage() {
   const [snapshot, quote] = await Promise.all([
@@ -32,17 +40,41 @@ export default async function AdminNumeraiPage() {
             <dd>{snapshot.ok ? "成功" : "失敗"}</dd>
           </div>
           <div>
+            <dt className="text-muted-foreground">総NMR</dt>
+            <dd>{formatStakeNmr(amount)}</dd>
+          </div>
+          <div>
             <dt className="text-muted-foreground">NMR円</dt>
             <dd>{yen === null ? "—" : formatYen(yen)}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">未ステークNMR</dt>
+            <dt className="text-muted-foreground">旧ウォレット残高</dt>
             <dd>
               {hasWalletToken
                 ? formatStakeNmr(snapshot.wallet?.availableNmr ?? null)
                 : "環境変数が未設定です"}
             </dd>
           </div>
+          {snapshot.round ? (
+            <>
+              <div>
+                <dt className="text-muted-foreground">ラウンド</dt>
+                <dd>
+                  {snapshot.round.number} / {formatRoundTarget(snapshot.round.target, snapshot.round.scoringDays)}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground">支払い対象</dt>
+                <dd>
+                  {snapshot.round.payoutScores.length === 0
+                    ? "—"
+                    : snapshot.round.payoutScores
+                        .map((score) => `${score.displayName} ${formatPayoutMultiplier(score.defaultMultiplier)}`)
+                        .join(" · ")}
+                </dd>
+              </div>
+            </>
+          ) : null}
           {snapshot.models.map((model) => (
             <div key={model.name}>
               <dt className="text-muted-foreground">{model.name}</dt>

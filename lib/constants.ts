@@ -53,6 +53,7 @@ export const SITE = {
   catchphrase: "データで世界を変える！",
   motto: "データから真実を見出そう",
   numeraiDocsUrl: "https://docs.numer.ai/numerai-tournament/readme",
+  numeraiStakingUrl: "https://docs.numer.ai/numerai-tournament/atomic-blockchain-staking",
   numeraiTipsUrl: "https://jp.docs.numer.ai/numerai-tnamento/new-users",
 } as const;
 

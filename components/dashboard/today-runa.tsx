@@ -133,8 +133,12 @@ export function TodayRunaCard({ feed }: { feed: TodayRunaFeed }) {
         <div className={toneBox(nmrTone)}>
           <p className={toneLabel(nmrTone)}>NMR</p>
           <div className="mt-3 space-y-1.5">
+            <Row label="総NMR" value={formatStakeNmr(feed.nmr.amount)} />
+            <Row label="Stake中" value={formatStakeNmr(feed.nmr.staked)} />
+            {feed.nmr.available !== null ? (
+              <Row label="旧ウォレット" value={formatStakeNmr(feed.nmr.available)} />
+            ) : null}
             <Row label="現在価値" value={nmrValue} />
-            <Row label="いまのStake" value={formatStakeNmr(feed.nmr.staked)} />
             <Row
               label="Stake前日比"
               value={formatSignedNmr(feed.nmr.stakeDelta)}
@@ -144,11 +148,12 @@ export function TodayRunaCard({ feed }: { feed: TodayRunaFeed }) {
             {nmrPct ? <Row label="変化率" value={nmrPct} tone={nmrTone} /> : null}
           </div>
           <p className="mt-3 text-xs text-zinc-500">
+            PayoutとBurnはラウンドが終わって確定してから、Stakeの枚数に入るよ。まだの分は収入にも内訳にも入れてないよ。
             {feed.nmr.deltaSource === "holdings"
               ? feed.nmr.stakeDelta !== null
-                ? "Stake前日比は枚数の増減だよ。円の前日比は、価格の動きと枚数の変化を含むよ。"
-                : "円の前日比は昨日の円と比べてるよ。Stakeの枚数は、昨日の記録が残ってから出すよ。"
-              : "いまは価格の24時間変化だけだよ。昨日のStakeが残ったら、支給も枚数で出るよ。"}
+                ? " Stake前日比は枚数の増減、円の前日比は価格と枚数の変化を含むよ。"
+                : " 円の前日比は昨日の円と比べてるよ。"
+              : " いまの円の前日比は価格の24時間変化だけだよ。"}
           </p>
         </div>
       </div>

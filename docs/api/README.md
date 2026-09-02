@@ -10,7 +10,7 @@
 | `/dashboard` | 収支ダッシュボード（いまのルナの状況 + 会計） |
 | `/calendar` | カレンダー |
 | `/ledger` | 取引明細（日付順・企画で絞れる） |
-| `/numerai` | ルナの Numerai モデル観察（Stake 円、成績、ひとこと、短い説明） |
+| `/numerai` | ルナの Numerai モデル観察（Stake 円、いまの大会、成績、ひとこと、短い説明） |
 | `/ideas` | 企画一覧・投稿。完了は `#past` |
 | `/ideas/[id]` | 採用・実施中・完了の企画詳細 |
 | `/ideas/p/[projectId]` | 募集案が無い挑戦の詳細 |
