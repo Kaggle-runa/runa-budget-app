@@ -3,8 +3,8 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/session";
-import { prisma } from "@/lib/db";
 import { revalidatePublic } from "@/lib/actions/revalidate";
+import { removeComicStrip, saveComicStrip } from "@/lib/comics";
 import { uploadPublicImage } from "@/lib/storage";
 
 const stripSchema = z.object({
@@ -41,17 +41,14 @@ export async function upsertComicStripAction(
       return { error: "4コマ1枚の画像が必要です" };
     }
 
-    const data = {
+    const saved = await saveComicStrip({
+      id: parsed.data.id,
       title: parsed.data.title,
       sortOrder: parsed.data.sortOrder,
       published: parsed.data.published === "true",
       imageUrl,
-    };
-    if (parsed.data.id) {
-      await prisma.comicStrip.update({ where: { id: parsed.data.id }, data });
-    } else {
-      await prisma.comicStrip.create({ data });
-    }
+    });
+    if (!saved.ok) return { error: saved.message };
     revalidatePublic();
   } catch (error) {
     const message =
@@ -64,6 +61,7 @@ export async function upsertComicStripAction(
 
 export async function deleteComicStripAction(id: string): Promise<void> {
   await requireAdmin();
-  await prisma.comicStrip.delete({ where: { id } });
+  const removed = await removeComicStrip(id);
+  if (!removed.ok) throw new Error(removed.message);
   revalidatePublic();
 }

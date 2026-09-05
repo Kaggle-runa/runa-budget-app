@@ -168,8 +168,9 @@ export async function getProject(id: string): Promise<ProjectDTO | null> {
   return toProjectDTO(row);
 }
 
-export async function listIdeas(): Promise<IdeaDTO[]> {
+export async function listIdeas(options?: { status?: string }): Promise<IdeaDTO[]> {
   const rows = await prisma.idea.findMany({
+    where: options?.status ? { status: options.status } : undefined,
     orderBy: { createdAt: "desc" },
   });
   return rows.map((row) => ({
@@ -264,6 +265,11 @@ export async function listComicStrips(options?: {
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
   });
   return rows.map(toComicStripDTO);
+}
+
+export async function getComicStrip(id: string): Promise<ComicStripDTO | null> {
+  const row = await prisma.comicStrip.findUnique({ where: { id } });
+  return row ? toComicStripDTO(row) : null;
 }
 
 export async function getLatestUpdatedAt(): Promise<Date | null> {

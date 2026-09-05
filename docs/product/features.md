@@ -81,7 +81,7 @@ Next.js 1本を Render に載せる。DB は Supabase Postgres。
 
 ### 14. 機械向け API
 
-LLM / 外部スクリプトが明細・予定を JSON で登録し、現状を読む。正本は [openapi.yaml](../api/openapi.yaml)。Bearer `RUNA_API_TOKEN`。管理画面は残す。公開 JSON は無い。NMR の円は総資産に入れるが損益には入れない。
+LLM / 外部スクリプトが明細・予定・お知らせ・4コマ・企画・挑戦を JSON で登録し、現状を読む。正本は [openapi.yaml](../api/openapi.yaml)。Bearer `RUNA_API_TOKEN`。管理画面は残す。公開 JSON は無い。NMR の円は総資産に入れるが損益には入れない。画像ファイルのアップロードは管理画面。API は公開 URL を渡す。
 
 ### 15. 挑戦の実況
 

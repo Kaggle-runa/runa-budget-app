@@ -8,8 +8,8 @@ info:
     使い方:
     1. GET /api/v1/meta で科目を覚える
     2. GET /api/v1/status で今の数字を読む
-    3. 必要なら明細・予定を日付で取る
-    4. 登録するときだけ POST
+    3. 必要なら明細・予定・お知らせ・4コマ・企画・挑戦を取る
+    4. 登録するときだけ POST / PATCH
 
     認証: `Authorization: Bearer <RUNA_API_TOKEN>`
     単位: 円の整数。日付: yyyy-MM-dd。日時: ISO 8601（推奨 Asia/Tokyo）
@@ -25,6 +25,9 @@ tags:
   - name: meta
   - name: status
   - name: projects
+  - name: announcements
+  - name: comics
+  - name: ideas
   - name: transactions
   - name: events
 paths:
@@ -49,12 +52,283 @@ paths:
   /api/v1/projects:
     get:
       tags: [projects]
-      summary: 企画一覧。取引・予定の projectId に使う
+      summary: 挑戦一覧。取引・予定・企画の projectId に使う
       responses:
         "200":
           description: "{ projects: Project[] }"
         "401":
           $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [projects]
+      summary: 挑戦作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectWrite"
+            example:
+              title: Numeraiで稼ぐ
+              status: active
+              masterNote: null
+              overview: 予測を出してNMRを稼ぐ
+              links: []
+      responses:
+        "201":
+          description: 作成した挑戦
+        "400":
+          $ref: "#/components/responses/Error"
+  /api/v1/projects/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [projects]
+      summary: 挑戦1件
+      responses:
+        "200":
+          description: 挑戦
+        "404":
+          $ref: "#/components/responses/Error"
+    patch:
+      tags: [projects]
+      summary: 挑戦更新（送った項目だけ）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectPatch"
+      responses:
+        "200":
+          description: 更新後の挑戦
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+    delete:
+      tags: [projects]
+      summary: 挑戦削除。明細・予定・募集案が付いているときは 422
+      responses:
+        "200":
+          description: "{ ok: true, id }"
+        "404":
+          $ref: "#/components/responses/Error"
+        "422":
+          $ref: "#/components/responses/Error"
+  /api/v1/announcements:
+    get:
+      tags: [announcements]
+      summary: お知らせ一覧。未公開も含む。published=true で公開だけ
+      parameters:
+        - in: query
+          name: published
+          schema: { type: string, enum: ["true"] }
+        - in: query
+          name: category
+          schema:
+            $ref: "#/components/schemas/AnnouncementCategory"
+      responses:
+        "200":
+          description: "{ announcements: Announcement[] }"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [announcements]
+      summary: お知らせ作成。画像は coverUrl（公開URL）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnouncementWrite"
+            example:
+              title: 配信します
+              body: 今夜20時からだよ
+              category: stream
+              publishedAt: "2026-09-06"
+              coverUrl: null
+              published: true
+      responses:
+        "201":
+          description: 作成したお知らせ
+        "400":
+          $ref: "#/components/responses/Error"
+  /api/v1/announcements/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [announcements]
+      summary: お知らせ1件
+      responses:
+        "200":
+          description: お知らせ
+        "404":
+          $ref: "#/components/responses/Error"
+    patch:
+      tags: [announcements]
+      summary: お知らせ更新（送った項目だけ）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnouncementPatch"
+      responses:
+        "200":
+          description: 更新後のお知らせ
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+    delete:
+      tags: [announcements]
+      summary: お知らせ削除。予定が付いているときは 422
+      responses:
+        "200":
+          description: "{ ok: true, id }"
+        "404":
+          $ref: "#/components/responses/Error"
+        "422":
+          $ref: "#/components/responses/Error"
+  /api/v1/comics:
+    get:
+      tags: [comics]
+      summary: 4コマ一覧。未公開も含む。published=true で公開だけ
+      parameters:
+        - in: query
+          name: published
+          schema: { type: string, enum: ["true"] }
+      responses:
+        "200":
+          description: "{ comics: ComicStrip[] }"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [comics]
+      summary: 4コマ作成。画像は imageUrl（公開URL）が必須
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComicWrite"
+            example:
+              title: 1話
+              imageUrl: https://example.com/yonkoma.png
+              published: true
+              sortOrder: 0
+      responses:
+        "201":
+          description: 作成した4コマ
+        "400":
+          $ref: "#/components/responses/Error"
+  /api/v1/comics/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [comics]
+      summary: 4コマ1件
+      responses:
+        "200":
+          description: 4コマ
+        "404":
+          $ref: "#/components/responses/Error"
+    patch:
+      tags: [comics]
+      summary: 4コマ更新（送った項目だけ）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComicPatch"
+      responses:
+        "200":
+          description: 更新後の4コマ
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+    delete:
+      tags: [comics]
+      summary: 4コマ削除
+      responses:
+        "200":
+          description: "{ ok: true, id }"
+        "404":
+          $ref: "#/components/responses/Error"
+  /api/v1/ideas:
+    get:
+      tags: [ideas]
+      summary: 企画一覧。status で絞れる
+      parameters:
+        - in: query
+          name: status
+          schema:
+            $ref: "#/components/schemas/IdeaStatus"
+      responses:
+        "200":
+          description: "{ ideas: Idea[] }"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [ideas]
+      summary: 企画作成（公開フォームの honeypot は無し）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IdeaWrite"
+            example:
+              displayName: 匿名
+              title: 配信で料理してみる
+              body: 所持金の範囲で一品作る企画だよ
+              status: submitted
+              projectId: null
+      responses:
+        "201":
+          description: 作成した企画
+        "400":
+          $ref: "#/components/responses/Error"
+  /api/v1/ideas/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [ideas]
+      summary: 企画1件
+      responses:
+        "200":
+          description: 企画
+        "404":
+          $ref: "#/components/responses/Error"
+    patch:
+      tags: [ideas]
+      summary: 企画更新。ステータスと挑戦の紐づけはここ
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IdeaPatch"
+            example:
+              status: adopted
+              projectId: clxxx
+      responses:
+        "200":
+          description: 更新後の企画
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+    delete:
+      tags: [ideas]
+      summary: 企画削除
+      responses:
+        "200":
+          description: "{ ok: true, id }"
+        "404":
+          $ref: "#/components/responses/Error"
   /api/v1/transactions:
     get:
       tags: [transactions]
@@ -252,6 +526,22 @@ components:
     EventKind:
       type: string
       enum: [stream, release, project, other]
+    ProjectStatus:
+      type: string
+      enum: [planned, active, completed]
+    AnnouncementCategory:
+      type: string
+      enum: [news, stream, other]
+    IdeaStatus:
+      type: string
+      enum: [submitted, reviewing, adopted, in_progress, done]
+    ProjectLink:
+      type: object
+      required: [url]
+      properties:
+        kind: { type: string, enum: [youtube, note, other] }
+        label: { type: string, maxLength: 40 }
+        url: { type: string }
     TransactionWrite:
       type: object
       required: [date, type, amount, category, title]
@@ -313,6 +603,73 @@ components:
     EventPatch:
       type: object
       description: 更新する項目だけ送る
+    ProjectWrite:
+      type: object
+      required: [title, status]
+      properties:
+        title: { type: string, maxLength: 80 }
+        status:
+          $ref: "#/components/schemas/ProjectStatus"
+        masterNote: { type: [string, "null"], maxLength: 500 }
+        overview: { type: [string, "null"], maxLength: 400 }
+        links:
+          type: array
+          maxItems: 8
+          items:
+            $ref: "#/components/schemas/ProjectLink"
+    ProjectPatch:
+      type: object
+      description: 更新する項目だけ送る
+    AnnouncementWrite:
+      type: object
+      required: [title, body, category, publishedAt]
+      properties:
+        title: { type: string, maxLength: 80 }
+        body: { type: string, maxLength: 4000 }
+        category:
+          $ref: "#/components/schemas/AnnouncementCategory"
+        publishedAt:
+          type: string
+          format: date
+        coverUrl: { type: [string, "null"] }
+        published: { type: boolean }
+    AnnouncementPatch:
+      type: object
+      description: 更新する項目だけ送る
+    ComicWrite:
+      type: object
+      required: [title, imageUrl]
+      properties:
+        title: { type: string, maxLength: 80 }
+        imageUrl:
+          type: string
+          format: uri
+          description: 公開URL。ファイルアップロードは管理画面
+        published: { type: boolean }
+        sortOrder: { type: integer, minimum: 0, maximum: 9999 }
+    ComicPatch:
+      type: object
+      description: 更新する項目だけ送る
+    IdeaWrite:
+      type: object
+      required: [title, body]
+      properties:
+        displayName: { type: [string, "null"], maxLength: 40 }
+        title: { type: string, maxLength: 80 }
+        body: { type: string, minLength: 10, maxLength: 1000 }
+        status:
+          $ref: "#/components/schemas/IdeaStatus"
+        projectId: { type: [string, "null"] }
+    IdeaPatch:
+      type: object
+      description: 更新する項目だけ送る。ステータス更新は status と任意の projectId
+      properties:
+        displayName: { type: [string, "null"], maxLength: 40 }
+        title: { type: string, maxLength: 80 }
+        body: { type: string, minLength: 10, maxLength: 1000 }
+        status:
+          $ref: "#/components/schemas/IdeaStatus"
+        projectId: { type: [string, "null"] }
     Error:
       type: object
       required: [error]
@@ -323,6 +680,6 @@ components:
           properties:
             code:
               type: string
-              enum: [TOKEN_UNSET, UNAUTHORIZED, VALIDATION, SOLVENCY, NOT_FOUND, INTERNAL]
+              enum: [TOKEN_UNSET, UNAUTHORIZED, VALIDATION, SOLVENCY, CONFLICT, NOT_FOUND, INTERNAL]
             message: { type: string }
             hint: { type: string }

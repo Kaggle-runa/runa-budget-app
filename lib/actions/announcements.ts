@@ -3,8 +3,8 @@
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/session";
 import { ANNOUNCEMENT_CATEGORIES } from "@/lib/categories";
-import { prisma } from "@/lib/db";
 import { revalidatePublic } from "@/lib/actions/revalidate";
+import { removeAnnouncement, saveAnnouncement } from "@/lib/announcements";
 import { uploadAnnouncementImage } from "@/lib/storage";
 
 const announcementSchema = z.object({
@@ -58,33 +58,23 @@ export async function upsertAnnouncementAction(
     }
   }
 
-  try {
-    const data = {
-      title: parsed.data.title,
-      body: parsed.data.body,
-      category: parsed.data.category,
-      publishedAt,
-      coverUrl,
-      published: parsed.data.published === "true",
-    };
-    if (parsed.data.id) {
-      await prisma.announcement.update({
-        where: { id: parsed.data.id },
-        data,
-      });
-    } else {
-      await prisma.announcement.create({ data });
-    }
-    revalidatePublic();
-    return {};
-  } catch (error) {
-    console.error("upsertAnnouncementAction failed", error);
-    return { error: "保存に失敗しました" };
-  }
+  const saved = await saveAnnouncement({
+    id: parsed.data.id,
+    title: parsed.data.title,
+    body: parsed.data.body,
+    category: parsed.data.category,
+    publishedAt: parsed.data.publishedAt,
+    coverUrl,
+    published: parsed.data.published === "true",
+  });
+  if (!saved.ok) return { error: saved.message };
+  revalidatePublic();
+  return {};
 }
 
 export async function deleteAnnouncementAction(id: string): Promise<void> {
   await requireAdmin();
-  await prisma.announcement.delete({ where: { id } });
+  const removed = await removeAnnouncement(id);
+  if (!removed.ok) throw new Error(removed.message);
   revalidatePublic();
 }

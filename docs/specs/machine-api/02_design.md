@@ -8,7 +8,14 @@ HTML 画面は増えない。JSON のみ。
 |------|------|
 | `/api/v1/meta` | 科目・種別の辞書 |
 | `/api/v1/status` | 生存KPI + NMR円 + 直近明細・予定 |
-| `/api/v1/projects` | 企画一覧 |
+| `/api/v1/projects` | 挑戦の一覧・作成 |
+| `/api/v1/projects/[id]` | 挑戦の取得・更新・削除 |
+| `/api/v1/announcements` | お知らせの一覧・作成 |
+| `/api/v1/announcements/[id]` | お知らせの取得・更新・削除 |
+| `/api/v1/comics` | 4コマの一覧・作成 |
+| `/api/v1/comics/[id]` | 4コマの取得・更新・削除 |
+| `/api/v1/ideas` | 企画の一覧・作成 |
+| `/api/v1/ideas/[id]` | 企画の取得・更新・削除 |
 | `/api/v1/transactions` | 明細の一覧・作成 |
 | `/api/v1/transactions/[id]` | 明細の取得・更新・削除 |
 | `/api/v1/events` | 予定の一覧・作成 |
@@ -23,8 +30,9 @@ HTML 画面は増えない。JSON のみ。
 
 ## 更新経路
 
-書き込みは `lib/transactions.ts` / `lib/events.ts`。管理画面の Server Action もここを使う。
+書き込みは `lib/transactions.ts` / `lib/events.ts` / `lib/announcements.ts` / `lib/comics.ts` / `lib/ideas.ts` / `lib/projects.ts`。管理画面の Server Action もここを使う。
 現金・借入残高の検査は今の管理画面と同じ。成功時は `revalidatePublic()`。
+画像ファイルのアップロードは管理画面だけ。API は公開 URL を渡す。
 
 ## データモデル
 
@@ -38,6 +46,10 @@ lib/api/auth.ts
 lib/api/http.ts
 lib/transactions.ts
 lib/events.ts
+lib/announcements.ts
+lib/comics.ts
+lib/ideas.ts
+lib/projects.ts
 ```
 
 ページから Prisma は叩かない。API ルートは `lib/` 経由。
@@ -50,6 +62,7 @@ lib/events.ts
 | 認証失敗 | `UNAUTHORIZED` | 401 |
 | 入力不正 | `VALIDATION` | 400 |
 | 現金不足など | `SOLVENCY` | 422 |
+| 紐づきがあって消せない | `CONFLICT` | 422 |
 | 無い id | `NOT_FOUND` | 404 |
 | その他 | `INTERNAL` | 500 |
 

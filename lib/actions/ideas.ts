@@ -6,6 +6,8 @@ import { requireAdmin } from "@/lib/auth/session";
 import { IDEA_STATUSES } from "@/lib/categories";
 import { prisma } from "@/lib/db";
 import { revalidatePublic } from "@/lib/actions/revalidate";
+import { removeIdea, saveIdea } from "@/lib/ideas";
+import { getIdea } from "@/lib/queries";
 
 const ideaSchema = z.object({
   displayName: z.string().max(40).optional().or(z.literal("")),
@@ -84,18 +86,26 @@ export async function updateIdeaStatusAction(formData: FormData): Promise<void> 
     throw new Error("ステータスが不正です");
   }
 
-  await prisma.idea.update({
-    where: { id: parsed.data.id },
-    data: {
-      status: parsed.data.status,
-      projectId: parsed.data.projectId || null,
-    },
+  const current = await getIdea(parsed.data.id);
+  if (!current) {
+    throw new Error("その企画は無いよ");
+  }
+
+  const saved = await saveIdea({
+    id: parsed.data.id,
+    displayName: current.displayName,
+    title: current.title,
+    body: current.body,
+    status: parsed.data.status,
+    projectId: parsed.data.projectId || null,
   });
+  if (!saved.ok) throw new Error(saved.message);
   revalidatePublic();
 }
 
 export async function deleteIdeaAction(id: string): Promise<void> {
   await requireAdmin();
-  await prisma.idea.delete({ where: { id } });
+  const removed = await removeIdea(id);
+  if (!removed.ok) throw new Error(removed.message);
   revalidatePublic();
 }

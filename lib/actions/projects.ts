@@ -3,9 +3,9 @@
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/session";
 import { PROJECT_STATUSES } from "@/lib/categories";
-import { prisma } from "@/lib/db";
 import { revalidatePublic } from "@/lib/actions/revalidate";
 import { parseProjectLinks } from "@/lib/project-links";
+import { removeProject, saveProject } from "@/lib/projects";
 
 const projectSchema = z.object({
   id: z.string().optional(),
@@ -46,36 +46,22 @@ export async function upsertProjectAction(
   }
   const links = parseProjectLinks(linksRaw);
 
-  const data = {
+  const saved = await saveProject({
+    id: parsed.data.id,
     title: parsed.data.title,
     status: parsed.data.status,
     masterNote: parsed.data.masterNote?.trim() || null,
     overview: parsed.data.overview?.trim() || null,
     links,
-  };
-
-  if (parsed.data.id) {
-    await prisma.project.update({
-      where: { id: parsed.data.id },
-      data,
-    });
-  } else {
-    await prisma.project.create({ data });
-  }
+  });
+  if (!saved.ok) return { error: saved.message };
   revalidatePublic();
   return {};
 }
 
 export async function deleteProjectAction(id: string): Promise<void> {
   await requireAdmin();
-  const [tx, event, idea] = await Promise.all([
-    prisma.transaction.count({ where: { projectId: id } }),
-    prisma.event.count({ where: { projectId: id } }),
-    prisma.idea.count({ where: { projectId: id } }),
-  ]);
-  if (tx + event + idea > 0) {
-    throw new Error("明細・予定・募集案が付いている挑戦は削除できません");
-  }
-  await prisma.project.delete({ where: { id } });
+  const removed = await removeProject(id);
+  if (!removed.ok) throw new Error(removed.message);
   revalidatePublic();
 }

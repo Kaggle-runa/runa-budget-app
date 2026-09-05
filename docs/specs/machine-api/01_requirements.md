@@ -45,7 +45,7 @@ HTML をスクレイプするのは壊れる。公開ページの口調やレイ
 
 - [ ] `Idempotency-Key`。同じキーの再送は同じ結果（LLM のリトライ対策）
 - [ ] 読み取り専用トークンと書き込みトークンの分離
-- [ ] お知らせ・4コマ・企画ステータスの API
+- [x] お知らせ・4コマ・企画ステータス・挑戦の API
 - [ ] 経済活動ログの API（ログ機能そのものが未実装）
 - [ ] MCP サーバ（Cursor / Claude のツールとして載せる）
 - [ ] note / YouTube / カード明細からの自動取込コネクタ（API を叩く側の仕事。このリポジトリの第1スライスではやらない）
@@ -82,6 +82,13 @@ HTML をスクレイプするのは壊れる。公開ページの口調やレイ
 4. トークンは読み書き1本（`RUNA_API_TOKEN`）
 5. 仕様の正本は `docs/api/openapi.yaml`
 
+## 決めたこと（2026-09-06）
+
+1. お知らせ・4コマ・企画・挑戦も `/api/v1` で CRUD する
+2. 画像ファイルは API では受けない。`coverUrl` / `imageUrl` に公開 URL を渡す
+3. 企画のステータス更新は `PATCH /api/v1/ideas/{id}`（`status` と任意の `projectId`）
+4. 明細・予定・募集案が付いている挑戦、予定が付いているお知らせは 422 `CONFLICT`
+
 ## 提案する API の形（レビュー用）
 
 実装前のたたき。正本は [docs/api/openapi.yaml](../../api/openapi.yaml)。
@@ -97,7 +104,11 @@ Content-Type: application/json
 |----------|------|------|
 | GET | `/api/v1/meta` | 科目・種別の辞書。最初に読む |
 | GET | `/api/v1/status` | 生存KPI + 直近の明細・予定。施策を考える入口 |
-| GET | `/api/v1/projects` | 企画 id 一覧 |
+| GET | `/api/v1/projects` | 挑戦 id 一覧 |
+| POST / PATCH / DELETE | `/api/v1/projects` | 挑戦の作成・更新・削除 |
+| GET / POST / PATCH / DELETE | `/api/v1/announcements` | お知らせ。画像は `coverUrl` |
+| GET / POST / PATCH / DELETE | `/api/v1/comics` | 4コマ。画像は `imageUrl` |
+| GET / POST / PATCH / DELETE | `/api/v1/ideas` | 企画。ステータスと挑戦紐づけ |
 | GET | `/api/v1/transactions` | 明細。`from` `to` `type` |
 | POST | `/api/v1/transactions` | 明細作成 |
 | PATCH | `/api/v1/transactions/{id}` | 明細更新 |

@@ -50,6 +50,125 @@ export const eventPatchSchema = eventCreateSchema.partial().refine(
   { message: "更新する項目を1つ以上入れてね" }
 );
 
+const optionalUrl = z
+  .union([z.string().url("URLの形が不正です"), z.literal(""), z.null()])
+  .optional();
+
+export const announcementCategorySchema = z.enum(["news", "stream", "other"]);
+export const ideaStatusSchema = z.enum([
+  "submitted",
+  "reviewing",
+  "adopted",
+  "in_progress",
+  "done",
+]);
+export const projectStatusSchema = z.enum(["planned", "active", "completed"]);
+
+const projectLinkSchema = z.object({
+  kind: z.enum(["youtube", "note", "other"]).optional(),
+  label: z.string().max(40).optional(),
+  url: z.string().min(1, "リンクのURLを入れてね"),
+});
+
+export const projectCreateSchema = z.object({
+  title: z.string().min(1, "タイトルを入れてね").max(80),
+  status: projectStatusSchema,
+  masterNote: z.string().max(500).nullable().optional(),
+  overview: z.string().max(400).nullable().optional(),
+  links: z.array(projectLinkSchema).max(8).optional(),
+});
+
+export const projectPatchSchema = projectCreateSchema.partial().refine(
+  (value) => Object.keys(value).length > 0,
+  { message: "更新する項目を1つ以上入れてね" }
+);
+
+export const announcementCreateSchema = z.object({
+  title: z.string().min(1, "タイトルを入れてね").max(80),
+  body: z.string().min(1, "本文を入れてね").max(4000),
+  category: announcementCategorySchema,
+  publishedAt: ymd,
+  coverUrl: optionalUrl,
+  published: z.boolean().optional(),
+});
+
+export const announcementPatchSchema = announcementCreateSchema.partial().refine(
+  (value) => Object.keys(value).length > 0,
+  { message: "更新する項目を1つ以上入れてね" }
+);
+
+export const comicCreateSchema = z.object({
+  title: z.string().min(1, "タイトルを入れてね").max(80),
+  imageUrl: z.string().url("画像URLの形が不正です"),
+  published: z.boolean().optional(),
+  sortOrder: z.number().int().min(0).max(9999).optional(),
+});
+
+export const comicPatchSchema = z
+  .object({
+    title: z.string().min(1, "タイトルを入れてね").max(80).optional(),
+    imageUrl: z.string().url("画像URLの形が不正です").optional(),
+    published: z.boolean().optional(),
+    sortOrder: z.number().int().min(0).max(9999).optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, {
+    message: "更新する項目を1つ以上入れてね",
+  });
+
+export const ideaCreateSchema = z.object({
+  displayName: z.string().max(40).nullable().optional(),
+  title: z.string().min(1, "タイトルを入れてね").max(80),
+  body: z.string().min(10, "企画の内容を10文字以上で書いてね").max(1000),
+  status: ideaStatusSchema.optional(),
+  projectId: z.string().min(1).nullable().optional(),
+});
+
+export const ideaPatchSchema = z
+  .object({
+    displayName: z.string().max(40).nullable().optional(),
+    title: z.string().min(1, "タイトルを入れてね").max(80).optional(),
+    body: z.string().min(10, "企画の内容を10文字以上で書いてね").max(1000).optional(),
+    status: ideaStatusSchema.optional(),
+    projectId: z.string().min(1).nullable().optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, {
+    message: "更新する項目を1つ以上入れてね",
+  });
+
+export function parseOptionalIdeaStatus(value: string | null) {
+  if (!value) return { ok: true as const, status: undefined };
+  const parsed = ideaStatusSchema.safeParse(value);
+  if (!parsed.success) {
+    return {
+      ok: false as const,
+      error: fail(
+        400,
+        "VALIDATION",
+        "status が不正です",
+        "submitted / reviewing / adopted / in_progress / done のいずれかだよ"
+      ),
+    };
+  }
+  return { ok: true as const, status: parsed.data };
+}
+
+export function parseOptionalAnnouncementCategory(value: string | null) {
+  if (!value) return { ok: true as const, category: undefined };
+  const parsed = announcementCategorySchema.safeParse(value);
+  if (!parsed.success) {
+    return {
+      ok: false as const,
+      error: fail(
+        400,
+        "VALIDATION",
+        "category が不正です",
+        "news / stream / other のいずれかだよ"
+      ),
+    };
+  }
+  return { ok: true as const, category: parsed.data };
+}
+
 export function parseYmdRange(
   fromRaw: string | null,
   toRaw: string | null,

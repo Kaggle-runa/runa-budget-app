@@ -6,3 +6,4 @@
 - [x] 4. `/api/v1` ルート
 - [x] 5. `docs/api/openapi.yaml` と env / api README
 - [x] 6. `npm run lint && npm run typecheck`
+- [x] 7. お知らせ・4コマ・企画・挑戦の CRUD

@@ -1,6 +1,6 @@
 # 公開パスと Server Action
 
-第1版は REST API をほぼ持たず、Server Action で更新する。
+視聴者向けの更新は Server Action。機械向けは `/api/v1`（Bearer `RUNA_API_TOKEN`）。
 
 ## 公開ページ
 
@@ -63,7 +63,10 @@
 |------|------|
 | `GET /api/v1/meta` | 科目・種別の辞書 |
 | `GET /api/v1/status` | 生存KPI + 総資産（現金+機材+NMR円）+ NMR円（損益には入れない）+ 直近明細・予定 |
-| `GET /api/v1/projects` | 企画一覧 |
+| `/api/v1/projects` | 挑戦の一覧 / 作成 / 更新 / 削除 |
+| `/api/v1/announcements` | お知らせの一覧 / 作成 / 更新 / 削除。画像は `coverUrl` |
+| `/api/v1/comics` | 4コマの一覧 / 作成 / 更新 / 削除。画像は `imageUrl` |
+| `/api/v1/ideas` | 企画の一覧 / 作成 / 更新（ステータス・挑戦紐づけ） / 削除 |
 | `/api/v1/transactions` | 明細の一覧 / 作成 / 更新 / 削除 |
 | `/api/v1/events` | 予定の一覧 / 作成 / 更新 / 削除 |
 
