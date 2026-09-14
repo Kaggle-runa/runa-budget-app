@@ -78,6 +78,7 @@ npm run typecheck
 | `NUMERAI_PUBLIC_ID` | Numerai 読み取り（任意） |
 | `NUMERAI_SECRET_KEY` | Numerai 読み取り（任意） |
 | `RUNA_API_TOKEN` | `/api/v1` の Bearer。16文字以上。未設定なら API は 503 |
+| `GA_MEASUREMENT_ID` | Google アナリティクス。空で無効。未設定の本番は `G-6JQH7Q9SS2` |
 
 新しい変数は `.env.example` と `lib/env.ts` に必ず足す。
 

@@ -12,6 +12,7 @@ const envSchema = z.object({
   NUMERAI_PUBLIC_ID: z.string().optional(),
   NUMERAI_SECRET_KEY: z.string().optional(),
   RUNA_API_TOKEN: z.union([z.string().min(16), z.literal("")]).optional(),
+  GA_MEASUREMENT_ID: z.string().optional(),
   NODE_ENV: z.enum(["development", "test", "production"]).optional(),
 });
 
@@ -34,6 +35,7 @@ export function getEnv(): AppEnv {
     NUMERAI_PUBLIC_ID: process.env.NUMERAI_PUBLIC_ID,
     NUMERAI_SECRET_KEY: process.env.NUMERAI_SECRET_KEY,
     RUNA_API_TOKEN: process.env.RUNA_API_TOKEN,
+    GA_MEASUREMENT_ID: process.env.GA_MEASUREMENT_ID,
     NODE_ENV: process.env.NODE_ENV,
   });
 
@@ -52,6 +54,20 @@ export function getEnv(): AppEnv {
 export function getGoogleFormUrl(): string | undefined {
   const url = getEnv().GOOGLE_FORM_URL;
   return url ? url : undefined;
+}
+
+const GA_ID_PATTERN = /^G-[A-Z0-9]+$/;
+const DEFAULT_GA_MEASUREMENT_ID = "G-6JQH7Q9SS2";
+
+/** 空文字で無効。未設定の本番は既定の測定ID。 */
+export function getGaMeasurementId(): string | undefined {
+  const raw = getEnv().GA_MEASUREMENT_ID;
+  if (raw === "") return undefined;
+  const id =
+    raw?.trim() ||
+    (getEnv().NODE_ENV === "production" ? DEFAULT_GA_MEASUREMENT_ID : "");
+  if (!id || !GA_ID_PATTERN.test(id)) return undefined;
+  return id;
 }
 
 /** Numerai 読み取り用。提出用キーは置かない。 */

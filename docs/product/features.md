@@ -65,7 +65,7 @@ CSS のみ。開幕カーテン、イージング、`prefers-reduced-motion` を
 
 ### 10. デプロイ
 
-Next.js 1本を Render に載せる。DB は Supabase Postgres。
+Next.js 1本を Render に載せる。DB は Supabase Postgres。公開ページに Google アナリティクス（gtag `G-6JQH7Q9SS2`）を載せる。管理画面は計測しない。`GA_MEASUREMENT_ID` が空なら無効。
 
 ### 11. 4コマ漫画
 

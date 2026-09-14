@@ -63,6 +63,7 @@ npm run dev
    - `GOOGLE_FORM_URL`（問い合わせの Google フォーム）
    - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`（お知らせ・4コマ画像。Settings > API）
    - `NUMERAI_PUBLIC_ID` / `NUMERAI_SECRET_KEY`（任意。旧ウォレット残高。スコープは `read_user_info` だけ）
+   - `GA_MEASUREMENT_ID`（任意。空で無効。未設定なら `G-6JQH7Q9SS2`）
 5. デプロイ後、`https://<service>.onrender.com/admin/login` で管理ログイン
 
 `render.yaml` を置いてあるので、Blueprint から作ってもよい。値は Dashboard で入れる。

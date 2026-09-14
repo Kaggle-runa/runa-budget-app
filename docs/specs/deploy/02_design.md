@@ -13,6 +13,7 @@ Next.js 1プロセス + Supabase Postgres。詳細は `docs/architecture/deploy.
 | `ADMIN_PASSWORD` | 管理ログイン |
 | `ADMIN_SECRET` | Cookie 署名 |
 | `RUNA_API_TOKEN` | `/api/v1` Bearer（任意。未設定なら API は 503） |
+| `GA_MEASUREMENT_ID` | Google アナリティクス（任意。空で無効。未設定の本番は `G-6JQH7Q9SS2`） |
 
 ## コンポーネント
 
