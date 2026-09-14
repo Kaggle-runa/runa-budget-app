@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { revalidatePublic } from "@/lib/actions/revalidate";
+import { readBearerToken, tokenFingerprint } from "@/lib/api/auth";
 import { failureResponse, handleApi, jsonError, readJsonBody } from "@/lib/api/http";
+import { createOrReplayTransaction, readIdempotencyKey } from "@/lib/api/ledger-ingest";
 import {
   firstZodMessage,
   parseOptionalTxType,
@@ -8,7 +10,6 @@ import {
   transactionCreateSchema,
 } from "@/lib/api/schemas";
 import { listTransactionsFiltered } from "@/lib/queries";
-import { saveTransaction } from "@/lib/transactions";
 
 export async function GET(request: Request) {
   return handleApi(request, async () => {
@@ -38,17 +39,19 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return jsonError(400, "VALIDATION", firstZodMessage(parsed.error));
     }
-    const saved = await saveTransaction({
-      date: parsed.data.date,
-      type: parsed.data.type,
-      amount: parsed.data.amount,
-      category: parsed.data.category,
-      title: parsed.data.title,
-      memo: parsed.data.memo ?? null,
-      projectId: parsed.data.projectId ?? null,
+    const idem = readIdempotencyKey(request);
+    if (!idem.ok) return jsonError(400, "VALIDATION", idem.message);
+    const bearer = readBearerToken(request);
+    if (!bearer) {
+      return jsonError(401, "UNAUTHORIZED", "認証できないよ");
+    }
+    const saved = await createOrReplayTransaction({
+      write: parsed.data,
+      tokenHash: tokenFingerprint(bearer),
+      idempotencyKey: idem.key,
     });
     if (!saved.ok) return failureResponse(saved);
-    revalidatePublic();
-    return NextResponse.json(saved.data, { status: 201 });
+    if (saved.result.created) revalidatePublic();
+    return NextResponse.json(saved.result.data, { status: saved.result.created ? 201 : 200 });
   });
 }

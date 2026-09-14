@@ -11,7 +11,9 @@ info:
     3. 必要なら明細・予定・お知らせ・4コマ・企画・挑戦を取る
     4. 登録するときだけ POST / PATCH
 
-    認証: `Authorization: Bearer <RUNA_API_TOKEN>`
+    認証: `Authorization: Bearer <RUNA_API_TOKEN>`（読み書き）または `RUNA_API_READ_TOKEN`（GETのみ）
+    自動登録する明細は `source` + `sourceEventId` か `Idempotency-Key` で再送しても1件。
+    部屋（配信）は読み取り専用トークン。書き込みは Action Gateway。
     単位: 円の整数。日付: yyyy-MM-dd。日時: ISO 8601（推奨 Asia/Tokyo）
     NMR の円は評価額。総資産には入れる。損益・自給率・現金には入れない。
 servers:
@@ -355,7 +357,9 @@ paths:
           $ref: "#/components/responses/Unauthorized"
     post:
       tags: [transactions]
-      summary: 明細作成
+      summary: 明細作成。同じ source+sourceEventId または Idempotency-Key の再送は既存を 200 で返す
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -363,14 +367,18 @@ paths:
             schema:
               $ref: "#/components/schemas/TransactionWrite"
             example:
-              date: "2026-08-26"
-              type: expense
-              category: llm_api
-              amount: 184
-              title: Claude API
+              date: "2026-09-14"
+              type: income
+              category: support
+              amount: 500
+              title: YouTube Super Chat
+              source: youtube
+              sourceEventId: superchat_xxxxx
               memo: null
               projectId: null
       responses:
+        "200":
+          description: 既存の明細（冪等の再送）
         "201":
           description: 作成した明細
         "400":
@@ -506,9 +514,15 @@ components:
       name: id
       required: true
       schema: { type: string }
+    IdempotencyKey:
+      in: header
+      name: Idempotency-Key
+      required: false
+      schema: { type: string, maxLength: 200 }
+      description: 同じキーの再送は同じ明細を返す。書き込みトークンごとに一意
   responses:
     Unauthorized:
-      description: トークンが無い・違う。未設定のときは 503 TOKEN_UNSET
+      description: トークンが無い・違う。読み取り専用トークンで POST した場合も 401。未設定のときは 503 TOKEN_UNSET
       content:
         application/json:
           schema:
@@ -570,6 +584,14 @@ components:
           type: [string, "null"]
         projectId:
           type: [string, "null"]
+        source:
+          type: [string, "null"]
+          maxLength: 40
+          description: 自動取込の出所。sourceEventId と両方入れるか、両方やめる
+        sourceEventId:
+          type: [string, "null"]
+          maxLength: 120
+          description: 出所側のイベント id。両方ある組はユニーク。再 POST は 200 で既存を返す
     TransactionPatch:
       type: object
       description: 更新する項目だけ送る

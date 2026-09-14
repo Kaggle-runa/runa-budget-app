@@ -20,6 +20,7 @@
 | 12 | 生存実験の実況 | `/` | [survival-experiment](../specs/survival-experiment/) | as-built |
 | 13 | Numerai モデル | `/numerai` | [live-status](../specs/live-status/) | 一部 |
 | 14 | 機械向け API | `/api/v1` | [machine-api](../specs/machine-api/) | as-built |
+| 16 | 自動取込 | `/api/v1/transactions` | [ledger-ingest](../specs/ledger-ingest/) | as-built。冪等と読み取り専用トークン |
 
 ## 各機能の要点
 
@@ -81,11 +82,15 @@ Next.js 1本を Render に載せる。DB は Supabase Postgres。公開ページ
 
 ### 14. 機械向け API
 
-LLM / 外部スクリプトが明細・予定・お知らせ・4コマ・企画・挑戦を JSON で登録し、現状を読む。正本は [openapi.yaml](../api/openapi.yaml)。Bearer `RUNA_API_TOKEN`。管理画面は残す。公開 JSON は無い。NMR の円は総資産に入れるが損益には入れない。画像ファイルのアップロードは管理画面。API は公開 URL を渡す。
+LLM / 外部スクリプトが明細・予定・お知らせ・4コマ・企画・挑戦を JSON で登録し、現状を読む。正本は [openapi.yaml](../api/openapi.yaml)。Bearer `RUNA_API_TOKEN`。管理画面は残す。公開 JSON は無い。NMR の円は総資産に入れるが損益には入れない。画像ファイルのアップロードは管理画面。API は公開 URL を渡す。自動取込の冪等は [ledger-ingest](../specs/ledger-ingest/)。
 
 ### 15. 挑戦の実況
 
 管理画面で挑戦を登録する。進行中はトップの「現在の挑戦」。完了は企画ページの「これまでの結果」。明細の企画欄で紐づけると、収益・トークン代・稼いだ金額が出る。仕組みの説明は note / YouTube などの外部リンク（YouTubeは埋め込み）。マスターの介入は挑戦に1メモ。
+
+### 16. 自動取込
+
+明細 POST の冪等（`source` + `sourceEventId` / `Idempotency-Key`）と、HUD 用の読み取り専用トークン。書き込みは Action Gateway。YouTube 等からの直接同期はこのリポジトリではやらない。要件は [ledger-ingest](../specs/ledger-ingest/)。
 
 ## 第1版でやらないこと
 

@@ -43,8 +43,8 @@ HTML をスクレイプするのは壊れる。公開ページの口調やレイ
 
 ### 任意（SHOULD / MAY）
 
-- [ ] `Idempotency-Key`。同じキーの再送は同じ結果（LLM のリトライ対策）
-- [ ] 読み取り専用トークンと書き込みトークンの分離
+- [x] `Idempotency-Key`。同じキーの再送は同じ結果（LLM のリトライ対策）→ 第2スライス [ledger-ingest](../ledger-ingest/)
+- [x] 読み取り専用トークンと書き込みトークンの分離 → 第2スライス [ledger-ingest](../ledger-ingest/)
 - [x] お知らせ・4コマ・企画ステータス・挑戦の API
 - [ ] 経済活動ログの API（ログ機能そのものが未実装）
 - [ ] MCP サーバ（Cursor / Claude のツールとして載せる）
@@ -88,6 +88,13 @@ HTML をスクレイプするのは壊れる。公開ページの口調やレイ
 2. 画像ファイルは API では受けない。`coverUrl` / `imageUrl` に公開 URL を渡す
 3. 企画のステータス更新は `PATCH /api/v1/ideas/{id}`（`status` と任意の `projectId`）
 4. 明細・予定・募集案が付いている挑戦、予定が付いているお知らせは 422 `CONFLICT`
+
+## 決めたこと（2026-09-14・レビュー用）
+
+1. 自動登録するなら冪等と読み取り専用トークンを先に足す。仕様は [ledger-ingest](../ledger-ingest/)
+2. 第1スライスの「トークンは読み書き1本」は、HUD 用の読み取り専用を足す形で上書きする
+3. 部屋（runa-stream-room）は GET だけ。書き込みは Action Gateway
+4. 無料枠の LLM 概算を明細にするかどうかは API では見ない。Gateway が送らない
 
 ## 提案する API の形（レビュー用）
 

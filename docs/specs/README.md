@@ -18,6 +18,7 @@ docs/specs/
 ├── survival-experiment/
 ├── live-status/
 ├── machine-api/
+├── ledger-ingest/     # 明細の冪等と読み取り専用トークン。as-built
 ├── contact/
 ├── admin/
 ├── motion/

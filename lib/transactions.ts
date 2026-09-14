@@ -13,6 +13,8 @@ export type TransactionWriteInput = {
   title: string;
   memo?: string | null;
   projectId?: string | null;
+  source?: string | null;
+  sourceEventId?: string | null;
 };
 
 type WriteOk<T> = { ok: true; data: T };
@@ -77,6 +79,8 @@ export async function saveTransaction(
     memo: input.memo || null,
     projectId: input.projectId || null,
     projectTitle: null,
+    source: input.source || null,
+    sourceEventId: input.sourceEventId || null,
   };
   const current = await loadSheetRows();
   if (input.id && !current.some((row) => row.id === input.id)) {
@@ -98,6 +102,12 @@ export async function saveTransaction(
     title: input.title,
     memo: input.memo || null,
     projectId: input.projectId || null,
+    ...(input.id
+      ? {}
+      : {
+          source: input.source || null,
+          sourceEventId: input.sourceEventId || null,
+        }),
   };
 
   try {
@@ -115,6 +125,9 @@ export async function saveTransaction(
   } catch (error) {
     if (isPrismaCode(error, "P2025")) {
       return fail(404, "NOT_FOUND", "その明細は無いよ");
+    }
+    if (isPrismaCode(error, "P2002")) {
+      return fail(422, "CONFLICT", "同じ source の明細がもうあるよ");
     }
     if (isPrismaCode(error, "P2003")) {
       return fail(

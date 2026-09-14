@@ -6,6 +6,15 @@ export function getRunaApiToken(): string | undefined {
   return token ? token : undefined;
 }
 
+export function getRunaApiReadToken(): string | undefined {
+  const token = getEnv().RUNA_API_READ_TOKEN?.trim();
+  return token ? token : undefined;
+}
+
+export function tokenFingerprint(token: string): string {
+  return hashed(token).toString("hex");
+}
+
 function hashed(value: string): Buffer {
   return createHash("sha256").update(value).digest();
 }

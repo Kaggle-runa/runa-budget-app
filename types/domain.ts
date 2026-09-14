@@ -12,6 +12,8 @@ export type TransactionDTO = {
   memo: string | null;
   projectId: string | null;
   projectTitle: string | null;
+  source?: string | null;
+  sourceEventId?: string | null;
 };
 
 export type EventDTO = {

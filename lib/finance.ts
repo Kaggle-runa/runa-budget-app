@@ -32,6 +32,8 @@ export function toTransactionDTO(row: {
   title: string;
   memo: string | null;
   projectId: string | null;
+  source?: string | null;
+  sourceEventId?: string | null;
   project: { title: string } | null;
 }): TransactionDTO {
   return {
@@ -44,6 +46,8 @@ export function toTransactionDTO(row: {
     memo: row.memo,
     projectId: row.projectId,
     projectTitle: row.project?.title ?? null,
+    source: row.source ?? null,
+    sourceEventId: row.sourceEventId ?? null,
   };
 }
 

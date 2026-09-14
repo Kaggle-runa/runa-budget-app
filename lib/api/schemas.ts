@@ -16,7 +16,7 @@ export const txTypeSchema = z.enum([
 
 export const eventKindSchema = z.enum(["stream", "release", "project", "other"]);
 
-export const transactionCreateSchema = z.object({
+export const transactionWriteSchema = z.object({
   date: ymd,
   type: txTypeSchema,
   amount: z.number().int().positive("金額は1円以上の整数だよ"),
@@ -24,9 +24,23 @@ export const transactionCreateSchema = z.object({
   title: z.string().min(1, "摘要を入れてね").max(80),
   memo: z.string().max(400).nullable().optional(),
   projectId: z.string().min(1).nullable().optional(),
+  source: z.string().trim().min(1).max(40).nullable().optional(),
+  sourceEventId: z.string().trim().min(1).max(120).nullable().optional(),
 });
 
-export const transactionPatchSchema = transactionCreateSchema.partial().refine(
+export const transactionCreateSchema = transactionWriteSchema.superRefine((value, ctx) => {
+  const source = value.source ?? null;
+  const sourceEventId = value.sourceEventId ?? null;
+  if (Boolean(source) !== Boolean(sourceEventId)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "source と sourceEventId は両方入れるか、両方やめてね",
+      path: source ? ["sourceEventId"] : ["source"],
+    });
+  }
+});
+
+export const transactionPatchSchema = transactionWriteSchema.partial().refine(
   (value) => Object.keys(value).length > 0,
   { message: "更新する項目を1つ以上入れてね" }
 );

@@ -59,7 +59,8 @@ npm run dev
 4. Environment
    - `DATABASE_URL` / `DIRECT_URL`（Supabase）
    - `ADMIN_PASSWORD` / `ADMIN_SECRET`（`openssl rand -hex 32` で秘密鍵を作る）
-   - LLM から明細を書くなら `RUNA_API_TOKEN`（16文字以上。`openssl rand -hex 32`）
+   - 家計簿を機械から書くなら `RUNA_API_TOKEN`（読み書き。Action Gateway が持つ）
+   - 部屋の HUD 用なら別に `RUNA_API_READ_TOKEN`（GET のみ。16文字以上。`openssl rand -hex 32`）
    - `GOOGLE_FORM_URL`（問い合わせの Google フォーム）
    - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`（お知らせ・4コマ画像。Settings > API）
    - `NUMERAI_PUBLIC_ID` / `NUMERAI_SECRET_KEY`（任意。旧ウォレット残高。スコープは `read_user_info` だけ）

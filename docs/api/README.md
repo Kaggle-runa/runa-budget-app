@@ -1,6 +1,6 @@
 # 公開パスと Server Action
 
-視聴者向けの更新は Server Action。機械向けは `/api/v1`（Bearer `RUNA_API_TOKEN`）。
+視聴者向けの更新は Server Action。機械向けは `/api/v1`（Bearer `RUNA_API_TOKEN` 読み書き / `RUNA_API_READ_TOKEN` GETのみ）。
 
 ## 公開ページ
 
@@ -57,7 +57,7 @@
 
 ## 機械向け API（`/api/v1`）
 
-正本は [openapi.yaml](./openapi.yaml)。Bearer `RUNA_API_TOKEN`。公開 JSON は無い。
+正本は [openapi.yaml](./openapi.yaml)。読み書きは `RUNA_API_TOKEN`。部屋の HUD は `RUNA_API_READ_TOKEN`。公開 JSON は無い。明細 POST は `source` + `sourceEventId` または `Idempotency-Key` で再送しても 1 件。
 
 | パス | 概要 |
 |------|------|

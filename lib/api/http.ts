@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { apiTokensMatch, getRunaApiToken, readBearerToken } from "@/lib/api/auth";
+import { apiTokensMatch, getRunaApiReadToken, getRunaApiToken, readBearerToken } from "@/lib/api/auth";
 
 export type ApiErrorBody = {
   error: {
@@ -42,26 +42,80 @@ export function failureResponse(error: ApiFailure): NextResponse<ApiErrorBody> {
   return jsonError(error.status, error.code, error.message, error.hint);
 }
 
+export type ApiAuthDecision =
+  | { ok: true }
+  | { ok: false; status: number; code: string; message: string; hint?: string };
+
+export function decideApiAuth(input: {
+  method: string;
+  writeConfigured: boolean;
+  readConfigured: boolean;
+  provided: boolean;
+  isWrite: boolean;
+  isRead: boolean;
+}): ApiAuthDecision {
+  if (!input.writeConfigured && !input.readConfigured) {
+    return {
+      ok: false,
+      status: 503,
+      code: "TOKEN_UNSET",
+      message: "APIトークンがサーバーに設定されていないよ",
+      hint: "環境変数 RUNA_API_TOKEN（読み書き）か RUNA_API_READ_TOKEN（GETのみ）を16文字以上で入れてね",
+    };
+  }
+  if (!input.provided) {
+    return {
+      ok: false,
+      status: 401,
+      code: "UNAUTHORIZED",
+      message: "認証できないよ",
+      hint: "Authorization: Bearer <token> を付けてね",
+    };
+  }
+  const needsWrite = input.method !== "GET" && input.method !== "HEAD";
+  if (needsWrite) {
+    if (input.isWrite) return { ok: true };
+    if (input.isRead) {
+      return {
+        ok: false,
+        status: 401,
+        code: "UNAUTHORIZED",
+        message: "読み取り専用トークンでは登録できないよ",
+        hint: "書き込みは RUNA_API_TOKEN か Action Gateway からにしてね",
+      };
+    }
+    return {
+      ok: false,
+      status: 401,
+      code: "UNAUTHORIZED",
+      message: "認証できないよ",
+      hint: "Authorization: Bearer <RUNA_API_TOKEN> を付けてね",
+    };
+  }
+  if (input.isWrite || input.isRead) return { ok: true };
+  return {
+    ok: false,
+    status: 401,
+    code: "UNAUTHORIZED",
+    message: "認証できないよ",
+    hint: "Authorization: Bearer <token> を付けてね",
+  };
+}
+
 export function requireApiAuth(request: Request): NextResponse<ApiErrorBody> | null {
-  const expected = getRunaApiToken();
-  if (!expected) {
-    return jsonError(
-      503,
-      "TOKEN_UNSET",
-      "APIトークンがサーバーに設定されていないよ",
-      "環境変数 RUNA_API_TOKEN を16文字以上で入れてね"
-    );
-  }
+  const write = getRunaApiToken();
+  const read = getRunaApiReadToken();
   const provided = readBearerToken(request);
-  if (!provided || !apiTokensMatch(provided, expected)) {
-    return jsonError(
-      401,
-      "UNAUTHORIZED",
-      "認証できないよ",
-      "Authorization: Bearer <RUNA_API_TOKEN> を付けてね"
-    );
-  }
-  return null;
+  const decided = decideApiAuth({
+    method: request.method,
+    writeConfigured: Boolean(write),
+    readConfigured: Boolean(read),
+    provided: Boolean(provided),
+    isWrite: Boolean(write && provided && apiTokensMatch(provided, write)),
+    isRead: Boolean(read && provided && apiTokensMatch(provided, read)),
+  });
+  if (decided.ok) return null;
+  return jsonError(decided.status, decided.code, decided.message, decided.hint);
 }
 
 export async function handleApi(

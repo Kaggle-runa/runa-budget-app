@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "prisma generate --schema prisma/schema.sqlite.prisma && tsc --noEmit",
+    "test:ingest": "tsx --test lib/api/ledger-ingest.test.ts",
     "postinstall": "prisma generate && prisma generate --schema prisma/schema.sqlite.prisma",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate deploy",

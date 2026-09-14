@@ -12,6 +12,7 @@ const envSchema = z.object({
   NUMERAI_PUBLIC_ID: z.string().optional(),
   NUMERAI_SECRET_KEY: z.string().optional(),
   RUNA_API_TOKEN: z.union([z.string().min(16), z.literal("")]).optional(),
+  RUNA_API_READ_TOKEN: z.union([z.string().min(16), z.literal("")]).optional(),
   GA_MEASUREMENT_ID: z.string().optional(),
   NODE_ENV: z.enum(["development", "test", "production"]).optional(),
 });
@@ -35,6 +36,7 @@ export function getEnv(): AppEnv {
     NUMERAI_PUBLIC_ID: process.env.NUMERAI_PUBLIC_ID,
     NUMERAI_SECRET_KEY: process.env.NUMERAI_SECRET_KEY,
     RUNA_API_TOKEN: process.env.RUNA_API_TOKEN,
+    RUNA_API_READ_TOKEN: process.env.RUNA_API_READ_TOKEN,
     GA_MEASUREMENT_ID: process.env.GA_MEASUREMENT_ID,
     NODE_ENV: process.env.NODE_ENV,
   });

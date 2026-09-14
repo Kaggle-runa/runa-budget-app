@@ -23,6 +23,15 @@ erDiagram
     string category
     string title
     string projectId FK
+    string source
+    string sourceEventId
+  }
+  ApiIdempotency {
+    string id PK
+    string key
+    string tokenHash
+    string requestHash
+    string transactionId
   }
   Event {
     string id PK
@@ -87,8 +96,12 @@ erDiagram
 | title | text | yes | 摘要 |
 | memo | text | no | |
 | projectId | text | no | Project |
+| source | text | no | 自動取込の出所。`sourceEventId` とセット |
+| sourceEventId | text | no | 出所側のイベント id |
 
-インデックス: `date`, `type`, `category`
+インデックス: `date`, `type`, `category`。`(source, sourceEventId)` はユニーク（両方 null の手入力は対象外）。
+
+自動取込の再送は `ApiIdempotency`（`Idempotency-Key` + トークン指紋）でも同じ取引へ戻す。
 
 ### type と category
 

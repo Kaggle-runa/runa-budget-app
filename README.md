@@ -56,7 +56,7 @@ npm run dev
 
 - 公開: http://localhost:3000
 - 管理: http://localhost:3000/admin/login （初期パスワードは `.env` の `ADMIN_PASSWORD`）
-- 機械向け API: [docs/api/openapi.yaml](docs/api/openapi.yaml)（`RUNA_API_TOKEN`）
+- 機械向け API: [docs/api/openapi.yaml](docs/api/openapi.yaml)（`RUNA_API_TOKEN` / `RUNA_API_READ_TOKEN`）
 
 ```bash
 npm run lint
@@ -77,7 +77,8 @@ npm run typecheck
 | `SUPABASE_SERVICE_ROLE_KEY` | Storage アップロード用。公開しない |
 | `NUMERAI_PUBLIC_ID` | Numerai 読み取り（任意） |
 | `NUMERAI_SECRET_KEY` | Numerai 読み取り（任意） |
-| `RUNA_API_TOKEN` | `/api/v1` の Bearer。16文字以上。未設定なら API は 503 |
+| `RUNA_API_TOKEN` | `/api/v1` の読み書き Bearer。16文字以上。Gateway 用 |
+| `RUNA_API_READ_TOKEN` | `/api/v1` の GET 専用。部屋の HUD 用。未設定でも書き込みトークンがあれば GET できる |
 | `GA_MEASUREMENT_ID` | Google アナリティクス。空で無効。未設定の本番は `G-6JQH7Q9SS2` |
 
 新しい変数は `.env.example` と `lib/env.ts` に必ず足す。

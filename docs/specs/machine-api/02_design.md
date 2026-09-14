@@ -25,8 +25,9 @@ HTML 画面は増えない。JSON のみ。
 
 ## 認証
 
-`Authorization: Bearer <RUNA_API_TOKEN>`。管理画面の Cookie とは別。
-未設定は 503、無い・違うトークンは 401。比較は SHA-256 してから `timingSafeEqual`。
+`Authorization: Bearer <token>`。`RUNA_API_TOKEN` は読み書き、`RUNA_API_READ_TOKEN` は GET のみ。管理画面の Cookie とは別。
+未設定は 503、無い・違うトークンは 401。読み取りトークンで POST も 401。比較は SHA-256 してから `timingSafeEqual`。
+明細 POST の冪等は [ledger-ingest](../ledger-ingest/)。
 
 ## 更新経路
 
