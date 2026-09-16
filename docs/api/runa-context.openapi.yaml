@@ -1,0 +1,34 @@
+openapi: 3.1.0
+info:
+  title: 華繰ルナ Runa Core Context API extension
+  version: "1.0.0"
+  description: |
+    docs/api/openapi.yaml の補足。人格は runa-core、事実は runa-budget-app、
+    配信ランタイムは runa-stream-room、公開アクションは runa-action-gateway を正本とする。
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/facts:
+    get:
+      summary: note / X / 説明文向けの確認済み事実
+      responses:
+        "200":
+          description: 事実スナップショット、factIndex、会計ルール
+        "401":
+          description: Bearer token が不正
+  /api/v1/world-state:
+    get:
+      summary: 配信・自律エージェント向けの部分 World State
+      description: |
+        activity / mood / energy / location / stream は null のまま返し、
+        runa-stream-room がランタイム値を補完する。欠損を推測して埋めてはいけない。
+      responses:
+        "200":
+          description: partial=true の World State base
+        "401":
+          description: Bearer token が不正
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer

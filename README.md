@@ -20,6 +20,19 @@
 | 問い合わせ | `/contact` | Google フォームへ |
 | 管理 | `/admin` | 取引・予定・企画・お知らせ |
 
+## Runa Core 連携
+
+このリポジトリは華繰ルナの人格そのものを持たず、**事実の正本**を担当する。
+人格・口調・価値観は `Kaggle-runa/runa-core`、配信中の現在行動は `runa-stream-room`、公開・投稿などの外部書き込みは `runa-action-gateway` を正本とする。
+
+機械向けには次を使う。
+
+- `GET /api/v1/meta`: API辞書 + Runa Core連携ルール
+- `GET /api/v1/facts`: note / X / 説明文が使う確認済み事実
+- `GET /api/v1/world-state`: 配信・自律エージェント向けの部分World State
+
+`world-state` の activity / mood / energy / location / stream は推測で埋めず、`runa-stream-room` が補完する。詳細は [docs/api/runa-context.md](docs/api/runa-context.md)。
+
 ## 技術スタック
 
 - Next.js 15 / React / TypeScript
@@ -57,6 +70,7 @@ npm run dev
 - 公開: http://localhost:3000
 - 管理: http://localhost:3000/admin/login （初期パスワードは `.env` の `ADMIN_PASSWORD`）
 - 機械向け API: [docs/api/openapi.yaml](docs/api/openapi.yaml)（`RUNA_API_TOKEN` / `RUNA_API_READ_TOKEN`）
+- Runa Core用コンテキスト: [docs/api/runa-context.md](docs/api/runa-context.md)
 
 ```bash
 npm run lint
@@ -78,7 +92,7 @@ npm run typecheck
 | `NUMERAI_PUBLIC_ID` | Numerai 読み取り（任意） |
 | `NUMERAI_SECRET_KEY` | Numerai 読み取り（任意） |
 | `RUNA_API_TOKEN` | `/api/v1` の読み書き Bearer。16文字以上。Gateway 用 |
-| `RUNA_API_READ_TOKEN` | `/api/v1` の GET 専用。部屋の HUD 用。未設定でも書き込みトークンがあれば GET できる |
+| `RUNA_API_READ_TOKEN` | `/api/v1` の GET 専用。部屋・note・X生成用。未設定でも書き込みトークンがあれば GET できる |
 | `GA_MEASUREMENT_ID` | Google アナリティクス。空で無効。未設定の本番は `G-6JQH7Q9SS2` |
 
 新しい変数は `.env.example` と `lib/env.ts` に必ず足す。
