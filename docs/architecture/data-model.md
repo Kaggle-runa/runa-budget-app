@@ -192,6 +192,31 @@ erDiagram
 | usdPrice | float | no | NMR/USD |
 | usdJpy | float | no | ドル円 |
 
+## RaceTicket
+
+競艇・競馬の買い目。集計の一次データはここ。現金へは種目・日付の合計を Transaction に起こす（買い目1行は明細にしない）。
+
+| 列 | 型 | 必須 | 値 |
+|----|----|------|-----|
+| sport | text | yes | `kyotei` 競艇 / `keiba` 競馬 |
+| date | text | yes | `yyyy-MM-dd` |
+| receiptNumber | text | yes | 受付番号 |
+| venue | text | yes | 場。空白は除いて保存 |
+| race | text | yes | レース（例: `2R`） |
+| betType | text | yes | 勝式 |
+| selection | text | yes | 組番。前後の空白は除く |
+| stakeYen | int | yes | 購入金額 |
+| hitStatus | text | yes | `hit` 的中 / `miss` なし |
+| payoutYen | int | yes | 払戻金。集計はこれ |
+| payoutTotalYen | int | yes | 払戻計。保存するが足さない |
+| source | text | no | API の出所。`sourceEventId` とセット |
+| sourceEventId | text | no | 出所側の id |
+
+ユニーク: 種目・日付・受付番号・場・レース・勝式・組番。`(source, sourceEventId)` もユニーク。
+`RaceIdempotency` は `Idempotency-Key` とトークン指紋で、再送を同じ買い目へ戻す。
+
+明細の接続: `Transaction.source = race`、`sourceEventId = {sport}:{date}:stake` または `:payout`。科目は `race_stake` / `race_payout`。
+
 ## 置かないもの
 
 - 視聴者アカウント（企画投稿は都度入力）

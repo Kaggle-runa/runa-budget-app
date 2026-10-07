@@ -11,6 +11,7 @@ const ITEMS = [
   { href: "/admin/announcements", label: "お知らせ" },
   { href: "/admin/yonkoma", label: "4コマ" },
   { href: "/admin/numerai", label: "Numerai" },
+  { href: "/admin/races", label: "レース" },
 ];
 
 export function AdminNav({ currentPath }: { currentPath: string }) {

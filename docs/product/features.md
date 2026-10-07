@@ -21,6 +21,7 @@
 | 13 | Numerai モデル | `/numerai` | [live-status](../specs/live-status/) | 一部 |
 | 14 | 機械向け API | `/api/v1` | [machine-api](../specs/machine-api/) | as-built |
 | 16 | 自動取込 | `/api/v1/transactions` | [ledger-ingest](../specs/ledger-ingest/) | as-built。冪等と読み取り専用トークン |
+| 17 | 競走の結果 | `/races` | [race-results](../specs/race-results/) | as-built。競艇CSVとAPI。現金に日次2行で繋ぐ |
 
 ## 各機能の要点
 
@@ -91,6 +92,12 @@ LLM / 外部スクリプトが明細・予定・お知らせ・4コマ・企画�
 ### 16. 自動取込
 
 明細 POST の冪等（`source` + `sourceEventId` / `Idempotency-Key`）と、HUD 用の読み取り専用トークン。書き込みは Action Gateway。YouTube 等からの直接同期はこのリポジトリではやらない。要件は [ledger-ingest](../specs/ledger-ingest/)。
+
+### 17. 競走の結果
+
+`/races` は競艇と競馬を1枚で見る。いまの残高は家計の現金。日次の収支、回収率（払戻 / 購入）、的中件数、レース一覧を出す。
+競艇はテレボート投票履歴 CSV（CP932 / UTF-8）を管理画面から取り込む。API は `POST /api/v1/race-tickets`。同じ買い目の再送では増えない。
+明細には種目・日付ごとに購入合計と払戻合計の2行だけ。現金・カレンダー・月次の損益と、自給率の収入に入る。購入はご飯代に入れない。買い方は書かない。競馬の CSV 列はサンプル待ち。
 
 ## 第1版でやらないこと
 

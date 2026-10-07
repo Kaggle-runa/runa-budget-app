@@ -130,3 +130,39 @@ model NmrDailySnapshot {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+model RaceTicket {
+  id             String   @id @default(cuid())
+  sport          String
+  date           String
+  receiptNumber  String
+  venue          String
+  race           String
+  betType        String
+  selection      String
+  stakeYen       Int
+  hitStatus      String
+  payoutYen      Int
+  payoutTotalYen Int
+  source         String?
+  sourceEventId  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([sport, date, receiptNumber, venue, race, betType, selection], name: "ticket_identity")
+  @@unique([source, sourceEventId], name: "source_event")
+  @@index([date])
+  @@index([sport])
+}
+
+model RaceIdempotency {
+  id           String   @id @default(cuid())
+  key          String
+  tokenHash    String
+  requestHash  String
+  raceTicketId String
+  createdAt    DateTime @default(now())
+
+  @@unique([key, tokenHash])
+  @@index([raceTicketId])
+}

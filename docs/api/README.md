@@ -11,6 +11,7 @@
 | `/calendar` | カレンダー |
 | `/ledger` | 取引明細（日付順・企画で絞れる） |
 | `/numerai` | ルナの Numerai モデル観察（Stake 円、いまの大会、成績、ひとこと、短い説明） |
+| `/races` | 競艇・競馬の結果。残高は家計の現金。日次収支・回収率・レース一覧 |
 | `/ideas` | 企画一覧・投稿。完了は `#past` |
 | `/ideas/[id]` | 採用・実施中・完了の企画詳細 |
 | `/ideas/p/[projectId]` | 募集案が無い挑戦の詳細 |
@@ -31,6 +32,7 @@
 | `/admin/announcements` | お知らせ CRUD | 必要 |
 | `/admin/yonkoma` | 4コマ CRUD | 必要 |
 | `/admin/numerai` | Numerai / NMR円の手動取得 | 必要 |
+| `/admin/races` | 競艇 CSV の取込 | 必要 |
 
 ## Server Action
 
@@ -50,6 +52,7 @@
 | `upsertProjectAction` | `lib/actions/projects.ts` | admin | 挑戦作成/更新 |
 | `deleteProjectAction` | `lib/actions/projects.ts` | admin | 挑戦削除 |
 | `refreshNumeraiAction` | `lib/actions/numerai.ts` | admin | Numeraiキャッシュ破棄と再取得 |
+| `importKyoteiCsvAction` | `lib/actions/races.ts` | admin | 競艇CSVを買い目と日次明細へ |
 | `updateIdeaStatusAction` | `lib/actions/ideas.ts` | admin | ステータス更新（FormData） |
 | `deleteIdeaAction` | `lib/actions/ideas.ts` | admin | 企画削除 |
 
@@ -69,4 +72,5 @@
 | `/api/v1/ideas` | 企画の一覧 / 作成 / 更新（ステータス・挑戦紐づけ） / 削除 |
 | `/api/v1/transactions` | 明細の一覧 / 作成 / 更新 / 削除 |
 | `/api/v1/events` | 予定の一覧 / 作成 / 更新 / 削除 |
+| `/api/v1/race-tickets` | 競走の買い目。POST は1件。再送は1行。日次の購入・払戻を明細へ。GET は一覧と集計 |
 

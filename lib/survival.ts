@@ -1,6 +1,6 @@
 import { format, subDays } from "date-fns";
 import type { ExpenseCategory } from "@/lib/categories";
-import { dateKey, signedLedgerAmount, summarizeMonth } from "@/lib/finance";
+import { dateKey, signedLedgerAmount } from "@/lib/finance";
 import type {
   ChallengePl,
   IdeaDTO,
@@ -87,11 +87,6 @@ export function summarizeSurvival(
   const todayKey = dateKey(today);
   const thisMonth = monthKey(today);
   const monthTx = transactions.filter((tx) => tx.date.startsWith(thisMonth));
-  const month = summarizeMonth(
-    transactions,
-    today.getFullYear(),
-    today.getMonth() + 1
-  );
   const monthMealCost = sumMeal(monthTx);
   const windowStart = dateKey(subDays(today, 29));
   const last30Meal = sumMeal(
@@ -106,23 +101,24 @@ export function summarizeSurvival(
     .filter((tx) => tx.date === todayKey)
     .reduce((sum, tx) => sum + signedLedgerAmount(tx), 0);
   const lifetimeMealCost = sumMeal(transactions);
-  const lifetimeIncome = transactions
-    .filter((tx) => tx.type === "income")
-    .reduce((sum, tx) => sum + tx.amount, 0);
+  const earned = (rows: TransactionDTO[]) =>
+    rows.filter((tx) => tx.type === "income").reduce((sum, tx) => sum + tx.amount, 0);
+  const lifetimeIncome = earned(transactions);
+  const monthEarned = earned(monthTx);
 
   const selfSufficiencyPercent =
-    monthMealCost === 0 ? null : Math.round((month.income / monthMealCost) * 100);
+    monthMealCost === 0 ? null : Math.round((monthEarned / monthMealCost) * 100);
   const surviving =
     cash >= 0 &&
     (selfSufficiencyPercent === null
-      ? month.income > 0 || cash > 0
+      ? monthEarned > 0 || cash > 0
       : selfSufficiencyPercent >= 100);
 
   return {
     cash,
     equipment,
     todayDelta,
-    monthIncome: month.income,
+    monthIncome: monthEarned,
     monthMealCost,
     selfSufficiencyPercent,
     surviving,

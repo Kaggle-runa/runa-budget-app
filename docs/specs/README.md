@@ -19,6 +19,7 @@ docs/specs/
 ├── live-status/
 ├── machine-api/
 ├── ledger-ingest/     # 明細の冪等と読み取り専用トークン。as-built
+├── race-results/      # 競艇・競馬の結果。現金に日次2行で繋ぐ。as-built
 ├── contact/
 ├── admin/
 ├── motion/

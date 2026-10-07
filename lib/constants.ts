@@ -115,6 +115,7 @@ export const NAV_ITEMS = [
   { href: "/", label: "紹介" },
   { href: "/dashboard", label: "収支" },
   { href: "/numerai", label: "Numerai" },
+  { href: "/races", label: "レース" },
   { href: "/calendar", label: "カレンダー" },
   { href: "/ledger", label: "明細" },
   { href: "/news", label: "お知らせ" },

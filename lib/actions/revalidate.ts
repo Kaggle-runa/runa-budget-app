@@ -4,6 +4,7 @@ export function revalidatePublic(): void {
   revalidatePath("/");
   revalidatePath("/dashboard");
   revalidatePath("/numerai");
+  revalidatePath("/races");
   revalidatePath("/calendar");
   revalidatePath("/ledger");
   revalidatePath("/ideas");
@@ -18,4 +19,5 @@ export function revalidatePublic(): void {
   revalidatePath("/admin/announcements");
   revalidatePath("/admin/yonkoma");
   revalidatePath("/admin/numerai");
+  revalidatePath("/admin/races");
 }

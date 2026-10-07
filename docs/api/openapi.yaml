@@ -32,6 +32,7 @@ tags:
   - name: ideas
   - name: transactions
   - name: events
+  - name: race-tickets
 paths:
   /api/v1/meta:
     get:
@@ -503,6 +504,61 @@ paths:
           description: "{ ok: true, id }"
         "404":
           $ref: "#/components/responses/Error"
+  /api/v1/race-tickets:
+    get:
+      tags: [race-tickets]
+      summary: 競走の買い目一覧と集計。現金は GET /api/v1/status
+      parameters:
+        - in: query
+          name: sport
+          schema: { type: string, enum: [kyotei, keiba] }
+        - in: query
+          name: from
+          schema: { type: string, format: date }
+        - in: query
+          name: to
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: "{ tickets: RaceTicket[], summary }"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [race-tickets]
+      summary: 買い目1件。同じ同一性または source+sourceEventId または Idempotency-Key の再送は1行。種目と日付の購入合計・払戻合計を明細へupsertする
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RaceTicketWrite"
+            example:
+              sport: kyotei
+              date: "2026-10-06"
+              receiptNumber: "2"
+              venue: 鳴門
+              race: 2R
+              betType: 拡連複
+              selection: 1=3
+              stakeYen: 100
+              hitStatus: hit
+              payoutYen: 200
+              payoutTotalYen: 200
+              source: kyotei-bot
+              sourceEventId: "2026-10-06:2:拡連複:1=3"
+      responses:
+        "200":
+          description: 既存の買い目（冪等の再送、または金額更新）
+        "201":
+          description: 作成した買い目。cash は家計の現金
+        "400":
+          $ref: "#/components/responses/Error"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/Error"
 components:
   securitySchemes:
     bearerAuth:
@@ -692,6 +748,23 @@ components:
         status:
           $ref: "#/components/schemas/IdeaStatus"
         projectId: { type: [string, "null"] }
+    RaceTicketWrite:
+      type: object
+      required: [sport, date, receiptNumber, venue, race, betType, selection, stakeYen, hitStatus, payoutYen, payoutTotalYen]
+      properties:
+        sport: { type: string, enum: [kyotei, keiba] }
+        date: { type: string, format: date }
+        receiptNumber: { type: string, maxLength: 40 }
+        venue: { type: string, maxLength: 40 }
+        race: { type: string, maxLength: 20 }
+        betType: { type: string, maxLength: 40 }
+        selection: { type: string, maxLength: 40 }
+        stakeYen: { type: integer, minimum: 1 }
+        hitStatus: { type: string, enum: [hit, miss] }
+        payoutYen: { type: integer, minimum: 0 }
+        payoutTotalYen: { type: integer, minimum: 0 }
+        source: { type: [string, "null"], maxLength: 40 }
+        sourceEventId: { type: [string, "null"], maxLength: 120 }
     Error:
       type: object
       required: [error]

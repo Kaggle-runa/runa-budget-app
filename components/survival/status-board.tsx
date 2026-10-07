@@ -138,7 +138,7 @@ export function SurvivalStatusBoard({
       </div>
 
       <p className="text-xs text-muted-foreground">
-        総資産は現金 + 機材 + NMRの円だよ。損益や自給率にはNMRを入れないんだ。株やFXはまだ入れてないよ。
+        総資産は現金 + 機材 + NMRの円だよ。損益や自給率にはNMRを入れないんだ。競走の払戻は収入に入るよ。株やFXはまだ入れてないよ。
         <Button asChild variant="link" className="h-auto px-1 py-0 text-xs">
           <Link href="/ledger">明細を見る</Link>
         </Button>

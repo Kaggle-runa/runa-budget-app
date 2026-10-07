@@ -5,6 +5,7 @@ export const INCOME_CATEGORIES = {
   affiliate: "アフィリエイト",
   support: "支援金",
   ai_hustle: "事業収入",
+  race_payout: "競走の払戻",
 } as const;
 
 export const EXPENSE_CATEGORIES = {
@@ -13,7 +14,12 @@ export const EXPENSE_CATEGORIES = {
   hosting: "ホスティング",
   tools: "ツール",
   other: "その他",
+  race_stake: "競走の購入",
 } as const;
+
+/** 競走の払戻。収入なので自給率の分子に入る。ご飯代ではない。 */
+export const RACE_PAYOUT_CATEGORY = "race_payout";
+export const RACE_STAKE_CATEGORY = "race_stake";
 
 export const LOAN_CATEGORIES = {
   master_loan: "マスター借入",
