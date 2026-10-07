@@ -4,7 +4,7 @@ import { DashSectionHeader } from "@/components/dashboard/section-header";
 import { EmptyState } from "@/components/layout/empty-state";
 import { Button } from "@/components/ui/button";
 import { formatSignedYen, formatYen } from "@/lib/format";
-import { shiftMonth, type RaceGroupTotals } from "@/lib/races/summary";
+import { shiftMonth, type BetTypeBySport, type RaceGroupTotals } from "@/lib/races/summary";
 import {
   hitLabel,
   SPORT_LABEL,
@@ -92,7 +92,7 @@ export function RaceBoard({
   months: string[];
   days: RaceDayTotals[];
   monthRows: RaceGroupTotals[];
-  betTypes: RaceGroupTotals[];
+  betTypes: BetTypeBySport[];
   totals: RaceTotals;
   hasAny: boolean;
 }) {
@@ -226,44 +226,14 @@ export function RaceBoard({
         />
       ) : (
         <>
-          <section>
-            <h3 className="mb-3 text-base font-bold text-zinc-900">券種別の回収率</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] text-sm">
-                <thead className="bg-zinc-50 text-left text-zinc-500">
-                  <tr>
-                    <th className="px-4 py-3 font-medium">券種</th>
-                    <th className="px-4 py-3 text-right font-medium">購入</th>
-                    <th className="px-4 py-3 text-right font-medium">払戻</th>
-                    <th className="px-4 py-3 text-right font-medium">収支</th>
-                    <th className="px-4 py-3 text-right font-medium">回収率</th>
-                    <th className="px-4 py-3 text-right font-medium">的中</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {betTypes.map((row) => (
-                    <tr key={row.key} className="border-t border-zinc-100">
-                      <td className="px-4 py-3">{row.key}</td>
-                      <td className="px-4 py-3 text-right tabular-nums">
-                        {yenOrDash(row.stakeYen, row.stakeKnown)}
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums">
-                        {yenOrDash(row.payoutYen, row.stakeKnown)}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <Signed amount={row.netYen} />
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums">
-                        {recoveryText(row.recoveryPercent)}
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums">
-                        {row.hits}/{row.tickets}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <section className="space-y-6">
+            <h3 className="text-base font-bold text-zinc-900">券種別の回収率</h3>
+            {betTypes.map((group) => (
+              <div key={group.sport}>
+                <h4 className="mb-3 text-sm font-semibold text-zinc-700">{SPORT_LABEL[group.sport]}</h4>
+                <BetTypeTable rows={group.rows} />
+              </div>
+            ))}
           </section>
 
           {month === "all" ? (
@@ -391,6 +361,45 @@ export function RaceBoard({
           </section>
         </>
       )}
+    </div>
+  );
+}
+
+function BetTypeTable({ rows }: { rows: RaceGroupTotals[] }) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[640px] text-sm">
+        <thead className="bg-zinc-50 text-left text-zinc-500">
+          <tr>
+            <th className="px-4 py-3 font-medium">券種</th>
+            <th className="px-4 py-3 text-right font-medium">購入</th>
+            <th className="px-4 py-3 text-right font-medium">払戻</th>
+            <th className="px-4 py-3 text-right font-medium">収支</th>
+            <th className="px-4 py-3 text-right font-medium">回収率</th>
+            <th className="px-4 py-3 text-right font-medium">的中</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.key} className="border-t border-zinc-100">
+              <td className="px-4 py-3">{row.key}</td>
+              <td className="px-4 py-3 text-right tabular-nums">
+                {yenOrDash(row.stakeYen, row.stakeKnown)}
+              </td>
+              <td className="px-4 py-3 text-right tabular-nums">
+                {yenOrDash(row.payoutYen, row.stakeKnown)}
+              </td>
+              <td className="px-4 py-3 text-right">
+                <Signed amount={row.netYen} />
+              </td>
+              <td className="px-4 py-3 text-right tabular-nums">{recoveryText(row.recoveryPercent)}</td>
+              <td className="px-4 py-3 text-right tabular-nums">
+                {row.hits}/{row.tickets}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

@@ -1,6 +1,7 @@
-import type { HitStatus, RaceDayTotals, RaceTotals } from "@/lib/races/types";
+import { RACE_SPORTS, type HitStatus, type RaceDayTotals, type RaceSport, type RaceTotals } from "@/lib/races/types";
 
 type SummaryLine = {
+  sport: RaceSport;
   date: string;
   venue: string;
   race: string;
@@ -72,6 +73,20 @@ export function summarizeGroups(
 
 export function summarizeBetTypes(tickets: SummaryLine[]): RaceGroupTotals[] {
   return summarizeGroups(tickets, (ticket) => ticket.betType || "券種なし");
+}
+
+export type BetTypeBySport = {
+  sport: RaceSport;
+  rows: RaceGroupTotals[];
+};
+
+export function summarizeBetTypesBySport(tickets: SummaryLine[]): BetTypeBySport[] {
+  return RACE_SPORTS.filter((sport) => tickets.some((ticket) => ticket.sport === sport)).map(
+    (sport) => ({
+      sport,
+      rows: summarizeBetTypes(tickets.filter((ticket) => ticket.sport === sport)),
+    })
+  );
 }
 
 export function summarizeMonths(tickets: SummaryLine[]): RaceGroupTotals[] {

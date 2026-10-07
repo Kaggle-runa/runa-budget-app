@@ -9,7 +9,7 @@ import {
   monthBounds,
   pageWindow,
   RACE_PAGE_SIZE,
-  summarizeBetTypes,
+  summarizeBetTypesBySport,
   summarizeDays,
   summarizeMonths,
   summarizeTickets,
@@ -74,7 +74,7 @@ export default async function RacesPage({
           months={months}
           days={month === "all" ? [] : summarizeDays(period)}
           monthRows={month === "all" ? summarizeMonths(bySport) : []}
-          betTypes={summarizeBetTypes(listed)}
+          betTypes={summarizeBetTypesBySport(listed)}
           totals={summarizeTickets(listed)}
           hasAny={views.length > 0}
         />

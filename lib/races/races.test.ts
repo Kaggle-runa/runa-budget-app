@@ -11,6 +11,7 @@ import {
   monthBounds,
   pageWindow,
   summarizeBetTypes,
+  summarizeBetTypesBySport,
   summarizeTickets,
 } from "@/lib/races/summary";
 import { summarizeSurvival } from "@/lib/survival";
@@ -149,6 +150,14 @@ test("明細の競艇と競馬AIをレースにする", () => {
   assert.equal(totals.payoutYen, 120 + 130 + 2200 + 0 + 2200);
   assert.equal(totals.stakeKnown, true);
   assert.equal(totals.recoveryPercent, Math.round((4650 / 6200) * 1000) / 10);
+  const bySport = summarizeBetTypesBySport(rows);
+  assert.deepEqual(
+    bySport.map((group) => group.sport),
+    ["kyotei", "keiba"]
+  );
+  assert.equal(bySport[0].rows[0].key, "単勝");
+  assert.equal(bySport[0].rows[0].stakeYen, 200);
+  assert.equal(bySport[1].rows[0].stakeYen, 6000);
   assert.equal(parseLedgerRace({
     id: "4",
     date: "2026-05-30",
