@@ -10,8 +10,8 @@ import {
   SPORT_LABEL,
   type RaceDayTotals,
   type RaceSport,
-  type RaceTicketDTO,
   type RaceTotals,
+  type RaceView,
 } from "@/lib/races/types";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +23,11 @@ function recoveryText(rate: number | null): string {
 function monthLabel(month: string): string {
   const [year, mon] = month.split("-");
   return `${year}年${Number(mon)}月`;
+}
+
+function yenOrDash(amount: number | null, known = true): string {
+  if (!known || amount == null) return "—";
+  return formatYen(amount);
 }
 
 function Signed({ amount }: { amount: number }) {
@@ -73,7 +78,7 @@ export function RaceBoard({
   totals,
   hasAny,
 }: {
-  tickets: RaceTicketDTO[];
+  tickets: RaceView[];
   totalTickets: number;
   page: number;
   pages: number;
@@ -188,7 +193,8 @@ export function RaceBoard({
             <Signed amount={totals.netYen} />
           </dd>
           <p className="mt-1 text-xs text-muted-foreground">
-            購入 {formatYen(totals.stakeYen)} / 払戻 {formatYen(totals.payoutYen)}
+            購入 {yenOrDash(totals.stakeYen, totals.stakeKnown)} / 払戻{" "}
+            {yenOrDash(totals.payoutYen, totals.stakeKnown)}
           </p>
         </div>
         <div>
@@ -238,8 +244,12 @@ export function RaceBoard({
                   {betTypes.map((row) => (
                     <tr key={row.key} className="border-t border-zinc-100">
                       <td className="px-4 py-3">{row.key}</td>
-                      <td className="px-4 py-3 text-right tabular-nums">{formatYen(row.stakeYen)}</td>
-                      <td className="px-4 py-3 text-right tabular-nums">{formatYen(row.payoutYen)}</td>
+                      <td className="px-4 py-3 text-right tabular-nums">
+                        {yenOrDash(row.stakeYen, row.stakeKnown)}
+                      </td>
+                      <td className="px-4 py-3 text-right tabular-nums">
+                        {yenOrDash(row.payoutYen, row.stakeKnown)}
+                      </td>
                       <td className="px-4 py-3 text-right">
                         <Signed amount={row.netYen} />
                       </td>
@@ -264,6 +274,7 @@ export function RaceBoard({
                   key: row.key,
                   label: monthLabel(row.key),
                   href: racesHref({ sport, month: row.key }),
+                  stakeKnown: row.stakeKnown,
                   stakeYen: row.stakeYen,
                   payoutYen: row.payoutYen,
                   netYen: row.netYen,
@@ -292,6 +303,7 @@ export function RaceBoard({
                   label: row.date,
                   href: racesHref({ sport, month, day: row.date }),
                   selected: row.date === day,
+                  stakeKnown: row.stakeKnown,
                   stakeYen: row.stakeYen,
                   payoutYen: row.payoutYen,
                   netYen: row.netYen,
@@ -332,12 +344,15 @@ export function RaceBoard({
                       <td className="px-4 py-3 tabular-nums">{ticket.date}</td>
                       <td className="px-4 py-3">{SPORT_LABEL[ticket.sport]}</td>
                       <td className="px-4 py-3">{ticket.venue}</td>
-                      <td className="px-4 py-3">{ticket.race}</td>
-                      <td className="px-4 py-3">{ticket.betType}</td>
-                      <td className="px-4 py-3 tabular-nums">{ticket.selection}</td>
-                      <td className="px-4 py-3 text-right tabular-nums">{formatYen(ticket.stakeYen)}</td>
+                      <td className="px-4 py-3">
+                        {ticket.race}
+                        {ticket.note ? ` ${ticket.note}` : ""}
+                      </td>
+                      <td className="px-4 py-3">{ticket.betType || "—"}</td>
+                      <td className="px-4 py-3 tabular-nums">{ticket.selection || "—"}</td>
+                      <td className="px-4 py-3 text-right tabular-nums">{yenOrDash(ticket.stakeYen)}</td>
                       <td className="px-4 py-3">{hitLabel(ticket.hitStatus)}</td>
-                      <td className="px-4 py-3 text-right tabular-nums">{formatYen(ticket.payoutYen)}</td>
+                      <td className="px-4 py-3 text-right tabular-nums">{yenOrDash(ticket.payoutYen)}</td>
                       <td className="px-4 py-3 text-right">
                         <Signed amount={ticket.netYen} />
                       </td>
@@ -388,6 +403,7 @@ function PeriodTable({
     label: string;
     href: string;
     selected?: boolean;
+    stakeKnown: boolean;
     stakeYen: number;
     payoutYen: number;
     netYen: number;
@@ -420,8 +436,12 @@ function PeriodTable({
                   {row.label}
                 </Link>
               </td>
-              <td className="px-4 py-3 text-right tabular-nums">{formatYen(row.stakeYen)}</td>
-              <td className="px-4 py-3 text-right tabular-nums">{formatYen(row.payoutYen)}</td>
+              <td className="px-4 py-3 text-right tabular-nums">
+                {yenOrDash(row.stakeYen, row.stakeKnown)}
+              </td>
+              <td className="px-4 py-3 text-right tabular-nums">
+                {yenOrDash(row.payoutYen, row.stakeKnown)}
+              </td>
               <td className="px-4 py-3 text-right">
                 <Signed amount={row.netYen} />
               </td>

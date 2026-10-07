@@ -1,26 +1,49 @@
-import type { RaceDayTotals, RaceTicketInput, RaceTotals } from "@/lib/races/types";
+import type { HitStatus, RaceDayTotals, RaceTotals } from "@/lib/races/types";
+
+type SummaryLine = {
+  date: string;
+  venue: string;
+  race: string;
+  betType: string;
+  stakeYen: number | null;
+  payoutYen: number | null;
+  netYen?: number;
+  hitStatus: HitStatus | "unknown";
+};
 
 export function recoveryPercent(stakeYen: number, payoutYen: number): number | null {
   if (stakeYen <= 0) return null;
   return Math.round((payoutYen / stakeYen) * 1000) / 10;
 }
 
-export function summarizeTickets(tickets: RaceTicketInput[]): RaceTotals {
+function lineNet(ticket: SummaryLine): number {
+  if (ticket.netYen != null) return ticket.netYen;
+  return (ticket.payoutYen ?? 0) - (ticket.stakeYen ?? 0);
+}
+
+export function summarizeTickets(tickets: SummaryLine[]): RaceTotals {
   let stakeYen = 0;
   let payoutYen = 0;
+  let netYen = 0;
+  let stakeKnown = false;
   let hits = 0;
   const races = new Set<string>();
   for (const ticket of tickets) {
-    stakeYen += ticket.stakeYen;
-    payoutYen += ticket.payoutYen;
+    netYen += lineNet(ticket);
+    if (ticket.stakeYen != null && ticket.payoutYen != null) {
+      stakeKnown = true;
+      stakeYen += ticket.stakeYen;
+      payoutYen += ticket.payoutYen;
+    }
     if (ticket.hitStatus === "hit") hits += 1;
     races.add(`${ticket.date}|${ticket.venue}|${ticket.race}`);
   }
   return {
     stakeYen,
     payoutYen,
-    netYen: payoutYen - stakeYen,
-    recoveryPercent: recoveryPercent(stakeYen, payoutYen),
+    netYen,
+    stakeKnown,
+    recoveryPercent: stakeKnown ? recoveryPercent(stakeYen, payoutYen) : null,
     hits,
     tickets: tickets.length,
     races: races.size,
@@ -32,10 +55,10 @@ export type RaceGroupTotals = RaceTotals & {
 };
 
 export function summarizeGroups(
-  tickets: RaceTicketInput[],
-  keyOf: (ticket: RaceTicketInput) => string
+  tickets: SummaryLine[],
+  keyOf: (ticket: SummaryLine) => string
 ): RaceGroupTotals[] {
-  const groups = new Map<string, RaceTicketInput[]>();
+  const groups = new Map<string, SummaryLine[]>();
   for (const ticket of tickets) {
     const key = keyOf(ticket);
     const rows = groups.get(key) ?? [];
@@ -47,11 +70,11 @@ export function summarizeGroups(
     .sort((a, b) => b.stakeYen - a.stakeYen || a.key.localeCompare(b.key, "ja"));
 }
 
-export function summarizeBetTypes(tickets: RaceTicketInput[]): RaceGroupTotals[] {
-  return summarizeGroups(tickets, (ticket) => ticket.betType);
+export function summarizeBetTypes(tickets: SummaryLine[]): RaceGroupTotals[] {
+  return summarizeGroups(tickets, (ticket) => ticket.betType || "券種なし");
 }
 
-export function summarizeMonths(tickets: RaceTicketInput[]): RaceGroupTotals[] {
+export function summarizeMonths(tickets: SummaryLine[]): RaceGroupTotals[] {
   return summarizeGroups(tickets, (ticket) => ticket.date.slice(0, 7)).sort((a, b) =>
     b.key.localeCompare(a.key)
   );
@@ -87,8 +110,8 @@ export function shiftMonth(month: string, delta: number): string | null {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
-export function summarizeDays(tickets: RaceTicketInput[]): RaceDayTotals[] {
-  const groups = new Map<string, RaceTicketInput[]>();
+export function summarizeDays(tickets: SummaryLine[]): RaceDayTotals[] {
+  const groups = new Map<string, SummaryLine[]>();
   for (const ticket of tickets) {
     const rows = groups.get(ticket.date) ?? [];
     rows.push(ticket);

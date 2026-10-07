@@ -29,10 +29,26 @@ export type RaceTotals = {
   stakeYen: number;
   payoutYen: number;
   netYen: number;
+  stakeKnown: boolean;
   recoveryPercent: number | null;
   hits: number;
   tickets: number;
   races: number;
+};
+
+export type RaceView = {
+  id: string;
+  sport: RaceSport;
+  date: string;
+  venue: string;
+  race: string;
+  betType: string;
+  selection: string;
+  note: string;
+  stakeYen: number | null;
+  payoutYen: number | null;
+  netYen: number;
+  hitStatus: HitStatus | "unknown";
 };
 
 export type RaceDayTotals = RaceTotals & {
@@ -52,6 +68,8 @@ export function normalizeVenue(value: string): string {
   return value.replace(/[\s\u3000]+/g, "");
 }
 
-export function hitLabel(status: HitStatus): string {
-  return status === "hit" ? "的中" : "なし";
+export function hitLabel(status: HitStatus | "unknown"): string {
+  if (status === "hit") return "的中";
+  if (status === "miss") return "なし";
+  return "—";
 }

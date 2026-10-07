@@ -3,6 +3,7 @@ import { DashCard } from "@/components/layout/dash-card";
 import { PageShell } from "@/components/layout/page-shell";
 import { balanceSheet } from "@/lib/finance";
 import { listTransactions } from "@/lib/queries";
+import { mergeRaceViews } from "@/lib/races/from-ledger";
 import { listRaceTickets } from "@/lib/races/queries";
 import {
   monthBounds,
@@ -13,7 +14,7 @@ import {
   summarizeMonths,
   summarizeTickets,
 } from "@/lib/races/summary";
-import { isRaceSport, type RaceSport, type RaceTicketDTO } from "@/lib/races/types";
+import { isRaceSport, type RaceSport, type RaceView } from "@/lib/races/types";
 
 function ymd(value: string | undefined): string {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return "";
@@ -39,7 +40,8 @@ export default async function RacesPage({
     listRaceTickets(),
     listTransactions(),
   ]);
-  const bySport = allTickets.filter((ticket) => !sport || ticket.sport === sport);
+  const views = mergeRaceViews(allTickets, transactions);
+  const bySport = views.filter((ticket) => !sport || ticket.sport === sport);
   const months = [...new Set(bySport.map((ticket) => ticket.date.slice(0, 7)))].sort((a, b) =>
     b.localeCompare(a)
   );
@@ -74,14 +76,14 @@ export default async function RacesPage({
           monthRows={month === "all" ? summarizeMonths(bySport) : []}
           betTypes={summarizeBetTypes(listed)}
           totals={summarizeTickets(listed)}
-          hasAny={allTickets.length > 0}
+          hasAny={views.length > 0}
         />
       </DashCard>
     </PageShell>
   );
 }
 
-function filterPeriod(tickets: RaceTicketDTO[], month: string): RaceTicketDTO[] {
+function filterPeriod(tickets: RaceView[], month: string): RaceView[] {
   if (month === "all" || !month) return tickets;
   const bounds = monthBounds(month);
   if (!bounds) return tickets;

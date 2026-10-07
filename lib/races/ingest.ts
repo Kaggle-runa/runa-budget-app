@@ -248,7 +248,7 @@ async function syncDays(tx: Tx, dayKeys: { sport: RaceSport; date: string }[]) {
   for (const line of lines) {
     const row = affected.find((item) => item.sourceEventId === line.sourceEventId);
     const data = {
-      date: new Date(`${line.date}T00:00:00`),
+      date: new Date(`${line.date}T12:00:00+09:00`),
       type: line.type,
       amount: line.amount,
       category: line.category,
@@ -293,7 +293,7 @@ export async function ingestRaceTickets(
       }
       await syncDays(tx, days);
       return { added, updated, unchanged, rows };
-    });
+    }, { maxWait: 20_000, timeout: 120_000 });
     const cash = await currentCash();
     return { ok: true, stats: { ...saved, cash }, rows: saved.rows };
   } catch (error) {
