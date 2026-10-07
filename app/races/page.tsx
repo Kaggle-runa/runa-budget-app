@@ -4,46 +4,86 @@ import { PageShell } from "@/components/layout/page-shell";
 import { balanceSheet } from "@/lib/finance";
 import { listTransactions } from "@/lib/queries";
 import { listRaceTickets } from "@/lib/races/queries";
-import { isRaceSport, type RaceSport } from "@/lib/races/types";
+import {
+  monthBounds,
+  pageWindow,
+  RACE_PAGE_SIZE,
+  summarizeBetTypes,
+  summarizeDays,
+  summarizeMonths,
+  summarizeTickets,
+} from "@/lib/races/summary";
+import { isRaceSport, type RaceSport, type RaceTicketDTO } from "@/lib/races/types";
 
 function ymd(value: string | undefined): string {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return "";
   return value;
 }
 
+function positivePage(value: string | undefined): number {
+  const page = Number(value);
+  if (!Number.isInteger(page) || page < 1) return 1;
+  return page;
+}
+
 export default async function RacesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sport?: string; from?: string; to?: string }>;
+  searchParams: Promise<{ sport?: string; month?: string; day?: string; page?: string }>;
 }) {
   const params = await searchParams;
   const sport: "" | RaceSport =
     params.sport && isRaceSport(params.sport) ? params.sport : "";
-  const from = ymd(params.from);
-  const to = ymd(params.to);
+  const day = ymd(params.day);
   const [allTickets, transactions] = await Promise.all([
     listRaceTickets(),
     listTransactions(),
   ]);
-  const tickets = allTickets.filter((ticket) => {
-    if (sport && ticket.sport !== sport) return false;
-    if (from && ticket.date < from) return false;
-    if (to && ticket.date > to) return false;
-    return true;
-  });
+  const bySport = allTickets.filter((ticket) => !sport || ticket.sport === sport);
+  const months = [...new Set(bySport.map((ticket) => ticket.date.slice(0, 7)))].sort((a, b) =>
+    b.localeCompare(a)
+  );
+  const month =
+    params.month === "all"
+      ? "all"
+      : params.month && monthBounds(params.month)
+        ? params.month
+        : (months[0] ?? "");
+  const period = filterPeriod(bySport, month);
+  const activeDay = day && period.some((ticket) => ticket.date === day) ? day : "";
+  const listed = activeDay ? period.filter((ticket) => ticket.date === activeDay) : period;
+  const window = pageWindow(listed.length, positivePage(params.page));
 
   return (
     <PageShell currentPath="/races">
       <DashCard>
         <RaceBoard
-          tickets={tickets}
+          tickets={listed.slice(window.start, window.end)}
+          totalTickets={listed.length}
+          page={window.current}
+          pages={window.pages}
+          pageStart={window.start}
+          pageEnd={window.end}
+          pageSize={RACE_PAGE_SIZE}
           cash={balanceSheet(transactions).cash}
           sport={sport}
-          from={from}
-          to={to}
+          month={month}
+          day={activeDay}
+          months={months}
+          days={month === "all" ? [] : summarizeDays(period)}
+          monthRows={month === "all" ? summarizeMonths(bySport) : []}
+          betTypes={summarizeBetTypes(listed)}
+          totals={summarizeTickets(listed)}
           hasAny={allTickets.length > 0}
         />
       </DashCard>
     </PageShell>
   );
+}
+
+function filterPeriod(tickets: RaceTicketDTO[], month: string): RaceTicketDTO[] {
+  if (month === "all" || !month) return tickets;
+  const bounds = monthBounds(month);
+  if (!bounds) return tickets;
+  return tickets.filter((ticket) => ticket.date >= bounds.from && ticket.date <= bounds.to);
 }
